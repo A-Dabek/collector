@@ -1,13 +1,21 @@
-import { Component } from '@angular/core';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import {IconComponent} from "./icon.component";
+import {NavigationComponent} from "./navigation.component";
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  imports: [RouterOutlet, IconComponent, NavigationComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    <nav>
+      <app-navbar/>
+    </nav>
+    <main>
+      <router-outlet/>
+    </main>
+  `,
 })
 export class AppComponent {
-  title = 'collector';
 }

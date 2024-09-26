@@ -7,7 +7,9 @@ import {initializeApp} from "firebase/app";
 import {getFirestore, provideFirestore} from "@angular/fire/firestore";
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideZoneChangeDetection({eventCoalescing: true}), provideRouter(routes),
+  providers: [
+    provideZoneChangeDetection({eventCoalescing: true}),
+    provideRouter(routes),
     provideFirebaseApp(() =>
       initializeApp({
         apiKey: "AIzaSyCWMEirzqk3V848iMTtGDUB2VwHq2YAHo8",
