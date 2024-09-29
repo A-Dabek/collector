@@ -1,7 +1,7 @@
-import {ChangeDetectionStrategy, Component} from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import {IconComponent} from "./icon.component";
-import {NavigationComponent} from "./navigation.component";
+import { IconComponent } from '../ui/icon.component';
+import { NavigationComponent } from '../ui/navigation.component';
 
 @Component({
   selector: 'app-root',
@@ -10,12 +10,11 @@ import {NavigationComponent} from "./navigation.component";
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <nav>
-      <app-navbar/>
+      <app-navbar />
     </nav>
     <main>
-      <router-outlet/>
+      <router-outlet />
     </main>
   `,
 })
-export class AppComponent {
-}
+export class AppComponent {}
