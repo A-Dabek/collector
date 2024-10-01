@@ -13,6 +13,7 @@ export class CollectionManagementService {
   private roll = inject(CollectionRollService);
 
   private localCopy: Record<string, Item> = {};
+
   readonly collection$ = this.persistence.items$.pipe(
     tap((items) => {
       this.localCopy = items.reduce(

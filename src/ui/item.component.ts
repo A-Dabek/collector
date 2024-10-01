@@ -7,6 +7,7 @@ import {
 import { IconComponent } from './icon.component';
 import { Id, Item } from '../services/collection-persistence.service';
 import { NgIf } from '@angular/common';
+import { rarities } from './rarity';
 
 @Component({
   selector: 'app-item',
@@ -22,20 +23,13 @@ import { NgIf } from '@angular/common';
       *ngIf="item() as item"
       [name]="item.id"
       [fill]="rarities[item.rarity || 0]"
+      [size]="size()"
     />
   `,
   imports: [IconComponent, NgIf],
 })
 export class ItemComponent {
-  item = input<(Item & Id) | undefined>();
-
-  private readonly rarityColors: { [key: string]: string } = {
-    common: '#D3D3D3', // LighterLightGray
-    uncommon: '#228B22', // DimDarkGreen
-    rare: '#4169E1', // RoyalBlue
-    epic: '#8A2BE2', // BlueViolet
-    legendary: '#FFD700', // Gold
-    mythic: '#DC143C', // Crimson Mythic Red
-  };
-  readonly rarities = Object.values(this.rarityColors);
+  readonly item = input<(Item & Id) | undefined>();
+  readonly size = input(1);
+  readonly rarities = rarities;
 }

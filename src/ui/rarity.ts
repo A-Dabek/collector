@@ -1,0 +1,10 @@
+export const rarityColors: { [key: string]: string } = {
+  common: '#D3D3D3', // LighterLightGray
+  uncommon: '#228B22', // DimDarkGreen
+  rare: '#4169E1', // RoyalBlue
+  epic: '#8A2BE2', // BlueViolet
+  legendary: '#FFD700', // Gold
+  mythic: '#DC143C', // Crimson Mythic Red
+};
+
+export const rarities = Object.values(rarityColors);

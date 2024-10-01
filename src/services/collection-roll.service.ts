@@ -22,7 +22,6 @@ export class CollectionRollService {
       .map((_, i) => baseProbability / Math.pow(decreasingFactor, i));
 
     const randomValue = Math.random();
-    console.log(randomValue, probabilities);
     let cumulativeProbability = 0;
 
     for (let i = 0; i < probabilities.length; i++) {
