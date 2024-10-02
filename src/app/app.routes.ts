@@ -15,7 +15,7 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: 'collection/common',
+    redirectTo: 'collection/0',
     pathMatch: 'full',
   },
 ];

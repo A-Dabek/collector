@@ -11,9 +11,9 @@ import { rarities, rarityColors } from './rarity';
   template: `
     <div class="pure-menu pure-menu-horizontal" [style.text-align]="'center'">
       <ul class="pure-menu-list">
-        @for (entry of rarityEntries; track entry[0]) {
+        @for (entry of rarityEntries; track entry[0]; let index = $index) {
           <li class="pure-menu-item">
-            <a [routerLink]="'../' + entry[0]" class="pure-menu-link">
+            <a [routerLink]="'../' + index" class="pure-menu-link">
               <app-icon
                 name="book-cover"
                 [fill]="entry[1]"

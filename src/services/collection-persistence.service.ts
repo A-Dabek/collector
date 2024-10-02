@@ -7,6 +7,7 @@ import {
   orderBy,
   query,
   setDoc,
+  where,
   writeBatch,
 } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
@@ -31,6 +32,11 @@ export class CollectionPersistenceService {
       idField: 'id',
     },
   ) as Observable<(Item & Id)[]>;
+
+  collectionByRarity(rarity: number): Observable<(Item & Id)[]> {
+    const rarityQuery = query(this.collection, where('rarity', '==', rarity));
+    return collectionData(rarityQuery, { idField: 'id' });
+  }
 
   setItem(id: string, item: Item) {
     setDoc(doc(this.collection, id), item);

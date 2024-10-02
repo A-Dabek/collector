@@ -1,6 +1,6 @@
-import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { map } from 'rxjs';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { map, switchMap } from 'rxjs';
 import { CollectionManagementService } from '../services/collection-management.service';
 import { AsyncPipe } from '@angular/common';
 import { ItemComponent } from '../ui/item.component';
@@ -16,7 +16,7 @@ import { NavigationComponent } from '../ui/rarity-navigation.component';
   template: `
     <app-rarity-navbar />
     <div class="pure-g">
-      @for (item of items$ | async; track item.id; let index = $index) {
+      @for (item of rarity$ | async; track item.id; let index = $index) {
         <div class="pure-u-1-5">
           <app-item
             [@itemEnter]="{ value: '', params: { delay: index * 50 } }"
@@ -34,7 +34,8 @@ export class CollectionViewComponent {
 
   readonly rarity$ = this.route.paramMap.pipe(
     map((params) => params.get('rarity')),
+    switchMap((rarity) =>
+      this.service.collectionByRarity(parseInt(rarity || '0')),
+    ),
   );
-
-  readonly items$ = this.service.collection$;
 }

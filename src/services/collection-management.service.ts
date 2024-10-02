@@ -14,6 +14,7 @@ export class CollectionManagementService {
 
   private localCopy: Record<string, Item> = {};
 
+  // TODO remove?
   readonly collection$ = this.persistence.items$.pipe(
     tap((items) => {
       this.localCopy = items.reduce(
@@ -25,6 +26,10 @@ export class CollectionManagementService {
       );
     }),
   );
+
+  collectionByRarity(rarity: number) {
+    return this.persistence.collectionByRarity(rarity);
+  }
 
   rollNewItems(count: number) {
     const newItems: (Item & Id)[] = [];
