@@ -10,7 +10,6 @@ import {
   bounceAnimation,
   bounceInOnEnterAnimation,
   rotateAnimation,
-  shakeAnimation,
 } from 'angular-animations';
 import { CollectionManagementService } from '../services/collection-management.service';
 import { Id, Item } from '../services/collection-persistence.service';
@@ -71,17 +70,18 @@ export class RollViewComponent {
 
   onIdleDone() {
     if (this.readyToRoll) {
+      this.randomItems.set([]);
       this.animateRoll = !this.animateRoll;
     } else {
       this.animateIdle = !this.animateIdle;
     }
   }
 
-  onOnClickDone() {
+  async onOnClickDone() {
     if (!this.readyToRoll) return;
     this.readyToRoll = false;
     this.animateIdle = !this.animateIdle;
-    const randomItems = this.service.rollNewItems(5);
+    const randomItems = await this.service.rollNewItems(5);
     this.randomItems.set(randomItems);
     this.service.addItems(randomItems);
   }

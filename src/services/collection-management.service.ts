@@ -6,45 +6,47 @@ import {
 } from './collection-persistence.service';
 import { CollectionRollService } from './collection-roll.service';
 import { tap } from 'rxjs';
+import { COLLECTION_CACHE } from './collection-cache';
 
 @Injectable({ providedIn: 'root' })
 export class CollectionManagementService {
   private persistence = inject(CollectionPersistenceService);
   private roll = inject(CollectionRollService);
 
-  private localCopy: Record<string, Item> = {};
-
-  // TODO remove?
-  readonly collection$ = this.persistence.items$.pipe(
-    tap((items) => {
-      this.localCopy = items.reduce(
-        (acc, item) => {
-          acc[item.id] = item;
-          return acc;
-        },
-        {} as Record<string, Item>,
-      );
-    }),
-  );
-
   collectionByRarity(rarity: number) {
-    return this.persistence.collectionByRarity(rarity);
+    return this.persistence
+      .collectionByRarity(rarity)
+      .pipe(
+        tap((items) =>
+          items.forEach((item) =>
+            COLLECTION_CACHE.addItem(item.id, item.rarity),
+          ),
+        ),
+      );
   }
 
-  rollNewItems(count: number) {
+  async rollNewItems(count: number) {
     const newItems: (Item & Id)[] = [];
     let attempts = 0;
-    while (newItems.length < count && attempts < count * 10) {
-      const newItem = this.roll.getRandomItem();
-      const existingItem = this.localCopy[newItem.name];
-      if (!existingItem || newItem.rarity > existingItem.rarity) {
-        newItems.push({
-          id: newItem.name,
-          rarity: newItem.rarity,
-          enhancement: '',
-        });
+    try {
+      while (newItems.length < count && attempts < count * 10) {
+        const newItem = this.roll.getRandomItem();
+        const exists = await this.persistence.checkItemExistsByIdAndRarity(
+          newItem.name,
+          newItem.rarity,
+        );
+        if (!exists) {
+          newItems.push({
+            id: newItem.name,
+            rarity: newItem.rarity,
+            enhancement: '',
+          });
+        }
+        attempts++;
       }
-      attempts++;
+    } catch (error) {
+      console.error('Failed to check item existence:', error);
+      return newItems;
     }
     return newItems;
   }
