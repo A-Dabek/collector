@@ -9,15 +9,15 @@ import { rarities, rarityColors } from './rarity';
   imports: [RouterLink, IconComponent],
   selector: 'app-rarity-navbar',
   template: `
-    <div class="pure-menu pure-menu-horizontal" [style.text-align]="'center'">
-      <ul class="pure-menu-list">
+    <div class="pure-menu pure-menu-horizontal text-center">
+      <ul class="pure-menu-list flex justify-center space-x-4">
         @for (entry of rarityEntries; track entry[0]; let index = $index) {
           <li class="pure-menu-item">
             <a [routerLink]="'../' + index" class="pure-menu-link">
               <app-icon
                 name="book-cover"
                 [fill]="entry[1]"
-                [style.display]="'inline'"
+                class="inline-block"
                 [size]="1.5"
               />
             </a>

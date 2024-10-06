@@ -8,36 +8,36 @@ import { IconComponent } from './icon.component';
   imports: [RouterLink, IconComponent],
   selector: 'app-navbar',
   template: `
-    <div class="pure-menu pure-menu-horizontal" [style.text-align]="'center'">
-      <ul class="pure-menu-list">
-        <li class="pure-menu-item">
-          <a routerLink="collection" class="pure-menu-link">
+    <div class="text-center">
+      <ul class="flex space-x-4">
+        <li>
+          <a routerLink="collection" class="flex items-center space-x-2">
             <app-icon
               name="book-cover"
               [style.display]="'inline'"
               [size]="1.5"
             />
-            Collection
+            <span>Collection</span>
           </a>
         </li>
-        <li class="pure-menu-item">
-          <a routerLink="roll" class="pure-menu-link">
+        <li>
+          <a routerLink="roll" class="flex items-center space-x-2">
             <app-icon
               name="rolling-dices"
               [style.display]="'inline'"
               [size]="1.5"
             />
-            Roll
+            <span>Roll</span>
           </a>
         </li>
-        <li class="pure-menu-item">
-          <a routerLink="game" class="pure-menu-link">
+        <li>
+          <a routerLink="game" class="flex items-center space-x-2">
             <app-icon
               name="rolling-dices"
               [style.display]="'inline'"
               [size]="1.5"
             />
-            Start a run
+            <span>Start a run</span>
           </a>
         </li>
       </ul>

@@ -12,7 +12,7 @@ import { NavigationComponent } from '../ui/navigation.component';
     <nav>
       <app-navbar />
     </nav>
-    <main>
+    <main class="pt-3 px-1">
       <router-outlet />
     </main>
   `,
