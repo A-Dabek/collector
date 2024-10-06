@@ -30,6 +30,16 @@ import { IconComponent } from './icon.component';
             Roll
           </a>
         </li>
+        <li class="pure-menu-item">
+          <a routerLink="game" class="pure-menu-link">
+            <app-icon
+              name="rolling-dices"
+              [style.display]="'inline'"
+              [size]="1.5"
+            />
+            Start a run
+          </a>
+        </li>
       </ul>
     </div>
   `,
