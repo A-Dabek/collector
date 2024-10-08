@@ -19,8 +19,9 @@ export interface Id {
 
 export interface Item {
   rarity: number;
-  enhancement: string;
 }
+
+export type ItemId = Id & Item;
 
 @Injectable({ providedIn: 'root' })
 export class CollectionPersistenceService {

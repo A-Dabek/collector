@@ -13,7 +13,7 @@ import iconCollection from '../../assets/result.json';
   template: `
     <style>
       :host {
-        display: block;
+        display: inline-block;
       }
     </style>
     <svg

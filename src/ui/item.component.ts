@@ -16,7 +16,7 @@ import { rarities } from './rarity';
   template: `
     <style>
       :host {
-        display: block;
+        display: inline-block;
       }
     </style>
     <app-icon

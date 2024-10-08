@@ -39,7 +39,6 @@ export class CollectionManagementService {
           newItems.push({
             id: newItem.name,
             rarity: newItem.rarity,
-            enhancement: '',
           });
         }
         attempts++;
