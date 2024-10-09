@@ -8,18 +8,14 @@ import {
   signal,
 } from '@angular/core';
 import {
-  bounceInLeftOnEnterAnimation,
+  bounceInRightOnEnterAnimation,
   headShakeAnimation,
 } from 'angular-animations';
-import { firstValueFrom } from 'rxjs';
-import { UiAction } from '../services/actions';
-import { Id, Item, ItemId } from '../services/collection-persistence.service';
-import {
-  GameRun,
-  GameRunPersistenceService,
-} from '../services/game-run-persistence.service';
+import { Id, Item } from '../services/collection-persistence.service';
 import { GameRunService } from '../services/game-run.service';
 import { ItemComponent } from '../ui/item.component';
+import { GameState } from './logic/state';
+import { UiAction } from './ui-actions';
 
 @Component({
   selector: 'app-game-view',
@@ -27,15 +23,15 @@ import { ItemComponent } from '../ui/item.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [ItemComponent, NgIf, NgForOf],
   animations: [
-    headShakeAnimation({ anchor: 'usage' }),
-    bounceInLeftOnEnterAnimation({ anchor: 'enter' }),
+    headShakeAnimation({ anchor: 'usage', duration: 500 }),
+    bounceInRightOnEnterAnimation({ anchor: 'enter', duration: 500 }),
   ],
   template: `
     <div class="w-full bg-gray-200 rounded-lg relative">
       <div
-        class="h-5 bg-teal-400 rounded-lg transition-width duration-1000"
+        class="h-5 bg-teal-400 rounded-lg transition-width duration-500"
         [style.width.%]="state().points"
-        (transitionend)="nextAnimation()"
+        (transitionend)="nextAnimation($event)"
       ></div>
       <div
         class="absolute inset-0 flex justify-center items-center text-sm text-gray-700"
@@ -44,12 +40,12 @@ import { ItemComponent } from '../ui/item.component';
       </div>
     </div>
     <div class="flex">
-      @for (item of items(); track item?.id) {
+      @for (item of state().items; track item?.id) {
         <app-item
           class="cursor-pointer"
           [@usage]="{ value: animate, params: {} }"
           [@enter]
-          (@enter.done)="nextAnimation()"
+          (@enter.done)="nextAnimation($event)"
           [item]="item"
           [size]="3"
           (click)="onItemClick(item)"
@@ -59,66 +55,45 @@ import { ItemComponent } from '../ui/item.component';
   `,
 })
 export class GameViewComponent implements OnInit {
-  private readonly service = inject(GameRunPersistenceService);
   private readonly gameRunService = inject(GameRunService);
 
-  readonly state = signal<GameRun>({
+  readonly state = signal<GameState>({
     points: 0,
     maxPoints: 100,
+    items: [],
   });
-  readonly items = signal<ItemId[]>([]);
-  readonly uiActions = signal<UiAction<unknown>[]>([]);
+  readonly uiActions = signal<UiAction[]>([]);
   readonly uiActionsEmpty = computed(() => this.uiActions().length === 0);
-
-  readonly persistedItems$ = this.service.gameItems$;
-  readonly persistedState$ = this.service.gameState$;
 
   animate = false;
 
   async ngOnInit() {
-    const state = await firstValueFrom(this.persistedState$);
-    const items = await firstValueFrom(this.persistedItems$);
-    const response = this.gameRunService.init(state, items);
-    this.newActions(response.uiActions);
-  }
-
-  async _conciliate() {
-    const state = await firstValueFrom(this.persistedState$);
-    const items = await firstValueFrom(this.persistedItems$);
-    this.gameRunService._conciliation(state, items);
+    const uiActions = await this.gameRunService.init();
+    this.onNewActions(uiActions);
   }
 
   async onItemClick(item: Item & Id) {
     this.animate = !this.animate;
-    const response = this.gameRunService.play(item);
-    this.newActions(response.uiActions);
-    await this._conciliate();
+    const uiActions = await this.gameRunService.play(item);
+    this.onNewActions(uiActions);
   }
 
-  private newActions(actions: UiAction<unknown>[]) {
+  private onNewActions(actions: UiAction[]) {
     const canStartActions = this.uiActionsEmpty();
-    console.log('can start', canStartActions, actions);
     this.uiActions.update((oldActions) => [...oldActions, ...actions]);
     if (canStartActions) {
       this.nextAnimation();
     }
   }
 
-  nextAnimation() {
+  nextAnimation(trigger?: any) {
+    console.log('[UI] next', trigger);
     if (this.uiActionsEmpty()) {
-      console.log('empty');
+      console.log('[UI] next > empty');
       return;
     }
     const current = this.uiActions()[0];
-    this.uiActions.update(([action, ...rest]) => rest);
-    console.log('nextAnimation', current);
-    if (current.type === 'itemAdd') {
-      this.items.update((items) => [...items, current.payload as ItemId]);
-    } else if (current.type === 'pointsChange') {
-      this.state.update((state) => ({
-        ...state,
-        points: state.points + (current.payload as number),
-      }));
-    }
+    this.uiActions.update(([, ...rest]) => rest);
+    this.state.update(current.update);
   }
 }

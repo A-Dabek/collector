@@ -5,12 +5,17 @@ import {
   doc,
   docData,
   Firestore,
-  setDoc,
   updateDoc,
   writeBatch,
 } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { Id, Item } from './collection-persistence.service';
+import {
+  ItemDeletePersistenceAction,
+  ItemSetPersistenceAction,
+  PersistenceAction,
+  PointsSetPersistenceAction,
+} from './persistence-action.factory';
 
 export interface GameRun {
   points: number;
@@ -29,31 +34,46 @@ export class GameRunPersistenceService {
     idField: 'id',
   }) as Observable<(Item & Id)[]>;
 
-  async startNewRun(): Promise<void> {
-    // reset run
-    const newRun: GameRun = {
-      points: 100,
-      maxPoints: 100,
-    };
-    await setDoc(this.gameDoc, newRun);
+  async persist(actions: PersistenceAction[]) {
+    actions.reverse();
+    const pointsUpdateActions = actions.find(
+      (action): action is PointsSetPersistenceAction =>
+        action.resource === 'POINTS',
+    );
+    if (pointsUpdateActions) {
+      await this.updatePoints(pointsUpdateActions.payload);
+    }
 
-    // reset items
-    const itemsSnapshot = await collectionData(this.gameItemsCollection);
+    // Create a map to track the first action for each item id
+    const firstItemActions = new Map<
+      string,
+      ItemSetPersistenceAction | ItemDeletePersistenceAction
+    >();
+
+    for (const action of actions) {
+      if (action.resource === 'ITEM') {
+        const itemId = action.op === 'SET' ? action.payload.id : action.payload;
+
+        if (!firstItemActions.has(itemId)) {
+          firstItemActions.set(itemId, action);
+        }
+      }
+    }
+
     const batch = writeBatch(this.firestore);
-    itemsSnapshot.forEach((item: any) => {
-      const itemDoc = doc(this.gameItemsCollection, item.id);
-      batch.delete(itemDoc);
-    });
+    for (const [itemId, action] of firstItemActions) {
+      console.log('[PERSIST] item', action.op, action.payload);
+      if (action.op === 'SET') {
+        batch.set(doc(this.gameItemsCollection, itemId), action.payload);
+      } else if (action.op === 'DELETE') {
+        batch.delete(doc(this.gameItemsCollection, itemId));
+      }
+    }
     await batch.commit();
-
-    // add first item
-    const item: Item = {
-      rarity: 0,
-    };
-    await setDoc(doc(this.gameItemsCollection, 'sacrificial-dagger'), item);
   }
 
-  async updatePoints(points: number) {
+  private async updatePoints(points: number) {
+    console.log('[PERSIST] points', points);
     const gameRun: Partial<GameRun> = { points };
     await updateDoc(this.gameDoc, gameRun);
   }

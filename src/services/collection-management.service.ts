@@ -32,14 +32,11 @@ export class CollectionManagementService {
       while (newItems.length < count && attempts < count * 10) {
         const newItem = this.roll.getRandomItem();
         const exists = await this.persistence.checkItemExistsByIdAndRarity(
-          newItem.name,
+          newItem.id,
           newItem.rarity,
         );
         if (!exists) {
-          newItems.push({
-            id: newItem.name,
-            rarity: newItem.rarity,
-          });
+          newItems.push(newItem);
         }
         attempts++;
       }

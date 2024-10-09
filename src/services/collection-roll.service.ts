@@ -1,17 +1,15 @@
 import { Injectable } from '@angular/core';
 import iconCollection from '../../assets/result.json';
+import { ItemId } from './collection-persistence.service';
 
 @Injectable({ providedIn: 'root' })
 export class CollectionRollService {
-  getRandomItem(): {
-    name: string;
-    rarity: number;
-  } {
+  getRandomItem(): ItemId {
     const keys = Object.keys(iconCollection);
     const randomKey = keys[Math.floor(Math.random() * keys.length)];
     const rarity = this.getRarity();
 
-    return { name: randomKey, rarity: rarity };
+    return { id: randomKey, rarity };
   }
 
   private getRarity = (): number => {
