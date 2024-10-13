@@ -1,4 +1,12 @@
-export const rarityColors: { [key: string]: string } = {
+export type Rarity =
+  | 'common'
+  | 'uncommon'
+  | 'rare'
+  | 'epic'
+  | 'legendary'
+  | 'mythic';
+
+export const rarityColors: Record<Rarity, string> = {
   common: '#D3D3D3', // LighterLightGray
   uncommon: '#228B22', // DimDarkGreen
   rare: '#4169E1', // RoyalBlue

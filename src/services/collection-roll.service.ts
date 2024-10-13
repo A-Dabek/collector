@@ -13,11 +13,24 @@ export class CollectionRollService {
   }
 
   private getRarity = (): number => {
-    const decreasingFactor = 10; // Change this to 5 if probabilities should be 5x less likely
-    const baseProbability = 0.9;
-    const probabilities = Array(6)
-      .fill(0)
-      .map((_, i) => baseProbability / Math.pow(decreasingFactor, i));
+    const decreasingFactor = 1.1;
+
+    const calculateBaseProbability = (factor: number): number => {
+      const sumInversePowers = Array(6)
+        .fill(0)
+        .reduce((sum, _, i) => sum + 1 / Math.pow(factor, i), 0);
+      return 1 / sumInversePowers;
+    };
+
+    const normalizeProbabilities = (factor: number): number[] => {
+      const baseProbability = calculateBaseProbability(factor);
+      return Array(6)
+        .fill(0)
+        .map((_, i) => baseProbability / Math.pow(factor, i));
+    };
+
+    const probabilities = normalizeProbabilities(decreasingFactor);
+    console.log(probabilities);
 
     const randomValue = Math.random();
     let cumulativeProbability = 0;

@@ -7,7 +7,7 @@ import {
 import { IconComponent } from './icon.component';
 import { Id, Item } from '../services/collection-persistence.service';
 import { NgIf } from '@angular/common';
-import { rarities } from './rarity';
+import { rarities, Rarity, rarityColors } from './rarity';
 
 @Component({
   selector: 'app-item',
@@ -22,7 +22,7 @@ import { rarities } from './rarity';
     <app-icon
       *ngIf="item() as item"
       [name]="item.id"
-      [fill]="rarities[item.rarity || 0]"
+      [rarity]="rarities[item.rarity || 0]"
       [size]="size()"
     />
   `,
@@ -31,5 +31,5 @@ import { rarities } from './rarity';
 export class ItemComponent {
   readonly item = input<(Item & Id) | undefined>();
   readonly size = input(1);
-  readonly rarities = rarities;
+  readonly rarities = Object.keys(rarityColors) as Rarity[];
 }

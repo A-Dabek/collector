@@ -5,6 +5,7 @@ import {
   computed,
 } from '@angular/core';
 import iconCollection from '../../assets/result.json';
+import { Rarity, rarityColors } from './rarity';
 
 @Component({
   selector: 'app-icon',
@@ -22,15 +23,20 @@ import iconCollection from '../../assets/result.json';
       [style.width]="size() + 'rem'"
       [style.height]="size() + 'rem'"
     >
-      <path d="M0 0h512v512H0z" [attr.fill]="backgroundFill()" />
-      <path [attr.fill]="fill()" [attr.d]="shape()" />
+      <path
+        [attr.filter]="'url(#' + rarity() + ')'"
+        [attr.fill]="fill()"
+        [attr.d]="shape()"
+      />
     </svg>
   `,
 })
 export class IconComponent {
-  readonly fill = input('#ffffff');
-  readonly backgroundFill = input('#000000');
+  readonly color = input('');
   readonly name = input('');
   readonly size = input(1);
+  readonly rarity = input<Rarity>('common');
+
   readonly shape = computed(() => (iconCollection as any)[this.name()] || '');
+  readonly fill = computed(() => rarityColors[this.rarity()]);
 }

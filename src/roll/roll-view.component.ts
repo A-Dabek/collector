@@ -14,6 +14,7 @@ import {
 import { CollectionManagementService } from '../services/collection-management.service';
 import { Id, Item } from '../services/collection-persistence.service';
 import { ItemComponent } from '../ui/item.component';
+import { rarities, rarityColors } from '../ui/rarity';
 
 @Component({
   selector: 'app-roll-view',
@@ -30,6 +31,16 @@ import { ItemComponent } from '../ui/item.component';
     bounceAnimation({ anchor: 'rollIdle', duration: 1000 }),
   ],
   template: `
+    <div>
+      <div>
+        <app-icon name="rolling-dices" rarity="common" [size]="8" />
+        <app-icon name="rolling-dices" rarity="uncommon" [size]="8" />
+        <app-icon name="rolling-dices" rarity="rare" [size]="8" />
+        <app-icon name="rolling-dices" rarity="epic" [size]="8" />
+        <app-icon name="rolling-dices" rarity="legendary" [size]="8" />
+        <app-icon name="rolling-dices" rarity="mythic" [size]="8" />
+      </div>
+    </div>
     <div
       [style.margin-top]="'10rem'"
       [style.display]="'flex'"
@@ -67,6 +78,8 @@ export class RollViewComponent {
   protected animateRoll = false;
   protected animateIdle = true;
   protected readyToRoll = false;
+
+  colors = rarities.slice(0, 6);
 
   onIdleDone() {
     if (this.readyToRoll) {

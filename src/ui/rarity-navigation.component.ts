@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { IconComponent } from './icon.component';
-import { rarities, rarityColors } from './rarity';
+import { rarities, Rarity, rarityColors } from './rarity';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -16,7 +16,7 @@ import { rarities, rarityColors } from './rarity';
             <a [routerLink]="'../' + index" class="pure-menu-link">
               <app-icon
                 name="book-cover"
-                [fill]="entry[1]"
+                [rarity]="entry"
                 class="inline-block"
                 [size]="1.5"
               />
@@ -28,5 +28,5 @@ import { rarities, rarityColors } from './rarity';
   `,
 })
 export class NavigationComponent {
-  readonly rarityEntries = Object.entries(rarityColors);
+  readonly rarityEntries = Object.keys(rarityColors) as Rarity[];
 }

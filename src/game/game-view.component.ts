@@ -39,7 +39,7 @@ import { UiAction } from './ui-actions';
         {{ state().points }}/{{ state().maxPoints }}
       </div>
     </div>
-    <div class="flex">
+    <div class="flex flex-wrap">
       @for (item of state().items; track item?.id) {
         <app-item
           class="cursor-pointer"
@@ -47,7 +47,7 @@ import { UiAction } from './ui-actions';
           [@enter]
           (@enter.done)="nextAnimation($event)"
           [item]="item"
-          [size]="3"
+          [size]="5"
           (click)="onItemClick(item)"
         />
       }
