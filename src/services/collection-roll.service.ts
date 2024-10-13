@@ -13,7 +13,7 @@ export class CollectionRollService {
   }
 
   private getRarity = (): number => {
-    const decreasingFactor = 1.1;
+    const decreasingFactor = 2;
 
     const calculateBaseProbability = (factor: number): number => {
       const sumInversePowers = Array(6)

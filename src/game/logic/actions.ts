@@ -11,10 +11,6 @@ export interface ResponseActions {
   uiActions: UiAction[];
 }
 
-export interface GameAction {
-  effect: ResponseActions;
-}
-
 export function combineActions(actions: ResponseActions[]): ResponseActions {
   const combinedPersistenceActions = actions.flatMap(
     (action) => action.persistenceActions,
@@ -45,7 +41,84 @@ export function cardCostAction(rarity: number): ResponseActions {
   return pointsChangeAction(6 - rarity);
 }
 
-export function cardDrawAction(): ResponseActions {
+export function cardDrawAction(count: number): ResponseActions {
   const roll = new CollectionRollService();
   return itemAddAction(roll.getRandomItem());
+}
+
+export function healAction(payload: number): ResponseActions {
+  return {
+    uiActions: [],
+    persistenceActions: [],
+  };
+}
+
+export function expandAction(count: number): ResponseActions {
+  return {
+    uiActions: [],
+    persistenceActions: [],
+  };
+}
+
+export function shrinkRandomAction(count: number): ResponseActions {
+  return {
+    uiActions: [],
+    persistenceActions: [],
+  };
+}
+
+export function shrinkAction(index: number): ResponseActions {
+  return {
+    uiActions: [],
+    persistenceActions: [],
+  };
+}
+
+export function destroyAction(): ResponseActions {
+  return {
+    uiActions: [],
+    persistenceActions: [],
+  };
+}
+
+export function destroyRandomAction(count: number): ResponseActions {
+  return {
+    uiActions: [],
+    persistenceActions: [],
+  };
+}
+
+export function earnPointsAction(points: number): ResponseActions {
+  return {
+    uiActions: [],
+    persistenceActions: [],
+  };
+}
+
+export function changeMaxHpAction(change: number): ResponseActions {
+  return {
+    uiActions: [],
+    persistenceActions: [],
+  };
+}
+
+export function healMissingHpAction(percent: number): ResponseActions {
+  return {
+    uiActions: [],
+    persistenceActions: [],
+  };
+}
+
+export function increaseLuckAction(luck: number): ResponseActions {
+  return {
+    uiActions: [],
+    persistenceActions: [],
+  };
+}
+
+export function healMaxHpAction(percent: number): ResponseActions {
+  return {
+    uiActions: [],
+    persistenceActions: [],
+  };
 }

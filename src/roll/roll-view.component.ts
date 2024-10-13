@@ -31,16 +31,16 @@ import { rarities, rarityColors } from '../ui/rarity';
     bounceAnimation({ anchor: 'rollIdle', duration: 1000 }),
   ],
   template: `
-    <div>
-      <div>
-        <app-icon name="rolling-dices" rarity="common" [size]="8" />
-        <app-icon name="rolling-dices" rarity="uncommon" [size]="8" />
-        <app-icon name="rolling-dices" rarity="rare" [size]="8" />
-        <app-icon name="rolling-dices" rarity="epic" [size]="8" />
-        <app-icon name="rolling-dices" rarity="legendary" [size]="8" />
-        <app-icon name="rolling-dices" rarity="mythic" [size]="8" />
-      </div>
-    </div>
+    <!--    <div>-->
+    <!--      <div>-->
+    <!--        <app-icon name="root-tip" rarity="common" [size]="8" />-->
+    <!--        <app-icon name="root-tip" rarity="uncommon" [size]="8" />-->
+    <!--        <app-icon name="root-tip" rarity="rare" [size]="8" />-->
+    <!--        <app-icon name="root-tip" rarity="epic" [size]="8" />-->
+    <!--        <app-icon name="root-tip" rarity="legendary" [size]="8" />-->
+    <!--        <app-icon name="root-tip" rarity="mythic" [size]="8" />-->
+    <!--      </div>-->
+    <!--    </div>-->
     <div
       [style.margin-top]="'10rem'"
       [style.display]="'flex'"

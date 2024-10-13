@@ -36,8 +36,7 @@ import { NavigationComponent } from '../ui/navigation.component';
             />
           </feDisplacementMap>
         </filter>
-
-        <filter id="epic">
+        <filter id="rare">
           <feTurbulence
             type="fractalNoise"
             baseFrequency="0.15"
@@ -68,28 +67,41 @@ import { NavigationComponent } from '../ui/navigation.component';
             />
           </feDisplacementMap>
         </filter>
-        <filter id="rare">
+        <filter id="epic">
           <feTurbulence
-            type="turbulence"
-            baseFrequency="0.02"
-            numOctaves="3"
+            type="fractalNoise"
+            baseFrequency="0.05"
+            numOctaves="2"
             result="turbulence"
           >
             <animate
               attributeName="baseFrequency"
-              values="0.02;0.1;0.02"
+              values="0.05;0.1;0.05"
+              keyTimes="0;0.5;1"
               dur="6s"
               repeatCount="indefinite"
             />
           </feTurbulence>
-          <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="10">
+          <feDisplacementMap
+            in="SourceGraphic"
+            in2="turbulence"
+            scale="50"
+            xChannelSelector="R"
+            yChannelSelector="G"
+            result="displacement"
+          >
             <animate
               attributeName="scale"
-              values="10;30;10"
+              values="0;100;0"
+              keyTimes="0;0.5;1"
               dur="6s"
               repeatCount="indefinite"
             />
           </feDisplacementMap>
+          <feMerge>
+            <feMergeNode in="displacement" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
         </filter>
         <filter
           id="legendary"
@@ -101,8 +113,8 @@ import { NavigationComponent } from '../ui/navigation.component';
         >
           <feTurbulence
             type="fractalNoise"
-            baseFrequency="0.1"
-            numOctaves="1"
+            baseFrequency="0.05"
+            numOctaves="3"
             result="noise"
             stitchTiles="stitch"
           />
@@ -112,17 +124,17 @@ import { NavigationComponent } from '../ui/navigation.component';
               attributeName="dy"
               from="0"
               to="-500"
-              dur="6s"
+              dur="4s"
               repeatCount="indefinite"
             />
           </feOffset>
-          <feOffset in="noise" dy="60" result="off2">
+          <feOffset in="noise" dy="00" result="off2">
             <animate
               attributeType="XML"
               attributeName="dy"
-              from="500"
+              from="400"
               to="0"
-              dur="6s"
+              dur="4s"
               repeatCount="indefinite"
             />
           </feOffset>
