@@ -52,7 +52,7 @@ export class GameRunPersistenceService {
 
     for (const action of actions) {
       if (action.resource === 'ITEM') {
-        const itemId = action.op === 'SET' ? action.payload.id : action.payload;
+        const itemId = action.payload;
 
         if (!firstItemActions.has(itemId)) {
           firstItemActions.set(itemId, action);
@@ -64,7 +64,7 @@ export class GameRunPersistenceService {
     for (const [itemId, action] of firstItemActions) {
       console.log('[PERSIST] item', action.op, action.payload);
       if (action.op === 'SET') {
-        batch.set(doc(this.gameItemsCollection, itemId), action.payload);
+        batch.set(doc(this.gameItemsCollection, itemId), {});
       } else if (action.op === 'DELETE') {
         batch.delete(doc(this.gameItemsCollection, itemId));
       }

@@ -79,8 +79,6 @@ export class RollViewComponent {
   protected animateIdle = true;
   protected readyToRoll = false;
 
-  colors = rarities.slice(0, 6);
-
   onIdleDone() {
     if (this.readyToRoll) {
       this.randomItems.set([]);

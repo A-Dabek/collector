@@ -1,7 +1,17 @@
-import { ItemId } from './collection-persistence.service';
-
 export interface PointsSetPersistenceAction {
   resource: 'POINTS';
+  op: 'SET';
+  payload: number;
+}
+
+export interface HealthSetPersistenceAction {
+  resource: 'HP';
+  op: 'SET';
+  payload: number;
+}
+
+export interface SpaceSetPersistenceAction {
+  resource: 'SPACE';
   op: 'SET';
   payload: number;
 }
@@ -15,18 +25,36 @@ export interface ItemDeletePersistenceAction {
 export interface ItemSetPersistenceAction {
   resource: 'ITEM';
   op: 'SET';
-  payload: ItemId;
+  payload: string;
 }
 
 export type PersistenceAction =
   | ItemSetPersistenceAction
   | ItemDeletePersistenceAction
-  | PointsSetPersistenceAction;
+  | PointsSetPersistenceAction
+  | HealthSetPersistenceAction
+  | SpaceSetPersistenceAction;
 
 export const PersistenceActionFactory = {
   setPoints(payload: number): PointsSetPersistenceAction {
     return {
       resource: 'POINTS',
+      op: 'SET',
+      payload,
+    };
+  },
+
+  setHealth(payload: number): HealthSetPersistenceAction {
+    return {
+      resource: 'HP',
+      op: 'SET',
+      payload,
+    };
+  },
+
+  setSpace(payload: number): SpaceSetPersistenceAction {
+    return {
+      resource: 'SPACE',
       op: 'SET',
       payload,
     };
@@ -40,7 +68,7 @@ export const PersistenceActionFactory = {
     };
   },
 
-  setItem(payload: ItemId): ItemSetPersistenceAction {
+  setItem(payload: string): ItemSetPersistenceAction {
     return {
       resource: 'ITEM',
       op: 'SET',

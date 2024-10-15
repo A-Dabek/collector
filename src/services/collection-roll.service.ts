@@ -1,15 +1,17 @@
 import { Injectable } from '@angular/core';
-import iconCollection from '../../assets/result.json';
-import { ItemId } from './collection-persistence.service';
+import {
+  Card,
+  findCardInLibrary,
+  findRandomCardOfRarity,
+} from '../game/logic/library';
+import { rarities } from '../ui/rarity';
 
 @Injectable({ providedIn: 'root' })
 export class CollectionRollService {
-  getRandomItem(): ItemId {
-    const keys = Object.keys(iconCollection);
-    const randomKey = keys[Math.floor(Math.random() * keys.length)];
-    const rarity = this.getRarity();
-
-    return { id: randomKey, rarity };
+  private getRandomItem(): Card {
+    const rarity = rarities[this.getRarity()];
+    const randomKey = findRandomCardOfRarity(rarity);
+    return findCardInLibrary(randomKey);
   }
 
   private getRarity = (): number => {
