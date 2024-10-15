@@ -9,6 +9,8 @@ import {
 import {
   bounceInRightOnEnterAnimation,
   bounceOutLeftOnLeaveAnimation,
+  collapseOnLeaveAnimation,
+  expandOnEnterAnimation,
   headShakeAnimation,
 } from 'angular-animations';
 import { GameRunService } from '../services/game-run.service';
@@ -28,6 +30,8 @@ import { ProgressBarComponent } from './ui/progress-bar.component';
     headShakeAnimation({ anchor: 'usage', duration: 500 }),
     bounceInRightOnEnterAnimation({ anchor: 'enter', duration: 500 }),
     bounceOutLeftOnLeaveAnimation({ anchor: 'leave', duration: 500 }),
+    expandOnEnterAnimation({ anchor: 'expand', duration: 500 }),
+    collapseOnLeaveAnimation({ anchor: 'shrink', duration: 500 }),
   ],
   template: `
     <app-bar
@@ -45,7 +49,15 @@ import { ProgressBarComponent } from './ui/progress-bar.component';
     />
     <div class="flex flex-wrap absolute opacity-20">
       @for (space of spaceArray(); let i = $index; track i) {
-        <app-icon class="px-1 py-5" name="stack" [size]="5" />
+        <app-icon
+          class="px-1 py-5"
+          name="stack"
+          [size]="5"
+          [@expand]
+          (@expand.done)="nextAnimation($event)"
+          [@shrink]
+          (@shrink.done)="nextAnimation($event)"
+        />
       }
     </div>
     <div class="flex flex-wrap relative">
@@ -53,11 +65,11 @@ import { ProgressBarComponent } from './ui/progress-bar.component';
         <app-card
           class="px-1"
           [card]="item"
+          (usage)="onPlay(item)"
           [@enter]
           (@enter.done)="nextAnimation($event)"
           [@leave]
           (@leave.done)="nextAnimation($event)"
-          (usage)="onPlay(item)"
         />
       }
     </div>

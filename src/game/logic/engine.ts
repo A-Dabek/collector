@@ -24,7 +24,10 @@ export class GameEngine {
 
   startNewGame(): ResponseActions {
     const health = 100;
-    const initialCards: Card[] = [findCardInLibrary('card-pickup')];
+    const initialCards: Card[] = [
+      findCardInLibrary('card-pickup'),
+      findCardInLibrary('spikes-init'),
+    ];
     this.state.set({
       points: 0,
       maxPoints: 100,
@@ -34,10 +37,13 @@ export class GameEngine {
       cards: initialCards,
     });
 
-    return GAME_ACTIONS.gameStart(initialCards, health);
+    return GAME_ACTIONS.gameStart(this.state(), initialCards, health);
   }
 
   play(card: Card): ResponseActions {
-    return createCard(card);
+    const playableCard = createCard(card);
+    const response = playableCard(this.state());
+    this.state.set(response.nextState);
+    return response;
   }
 }
