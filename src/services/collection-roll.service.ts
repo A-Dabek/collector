@@ -32,8 +32,6 @@ export class CollectionRollService {
     };
 
     const probabilities = normalizeProbabilities(decreasingFactor);
-    console.log(probabilities);
-
     const randomValue = Math.random();
     let cumulativeProbability = 0;
 

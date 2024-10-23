@@ -2,12 +2,12 @@ import { GAME_ACTIONS, ResponseActions } from '../actions/game-actions';
 import { GameState } from '../logic/engine';
 import { PlayableCard } from './card';
 
-export class CardPickupCard implements PlayableCard {
+export class PillCard implements PlayableCard {
   play(state: GameState): ResponseActions {
-    return GAME_ACTIONS.cardsDraw(2)(state);
+    return GAME_ACTIONS.setHealth(state.health + 10)(state);
   }
 
   enabled(state: GameState): boolean {
-    return state.space - state.cards.length > 0;
+    return state.health < state.maxHealth;
   }
 }

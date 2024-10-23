@@ -15,25 +15,15 @@ export interface ResponseActions {
 export type InteractiveAction = (state: GameState) => ResponseActions;
 
 export const GAME_ACTIONS = {
-  gameStart: function (
-    initialState: GameState,
-    cards: Card[],
-  ): InteractiveAction[] {
-    return [this.setHealth(initialState.maxHealth), this.cardsAdd(cards)];
-  },
-  gameFinish: function (state: GameState): InteractiveAction[] {
-    return [
-      this.setPoints(0),
-      this.setHealth(state.maxHealth),
-      this.allCardWaste,
-      this.setSpace(state.space),
-    ];
-  },
   setHealth: function (health: number): InteractiveAction {
     return function (state: GameState) {
+      const targetHealth = Math.min(health, state.maxHealth);
       return {
-        nextState: { ...state, health },
-        uiActions: [UI_ACTIONS.setHealth(health)],
+        nextState: {
+          ...state,
+          health: targetHealth,
+        },
+        uiActions: [UI_ACTIONS.setHealth(targetHealth)],
         persistenceActions: [PersistenceActionFactory.setHealth(health)],
       };
     };
@@ -49,30 +39,21 @@ export const GAME_ACTIONS = {
       };
     };
   },
-  cardPlay: function (
-    state: GameState,
-    card: Card,
-    actions: ((state: GameState) => ResponseActions)[],
-  ): InteractiveAction[] {
-    return [
-      this.cardCost(state, card.cost),
-      ...actions,
-      (state) => this.cardWaste(state, card),
-    ];
-  },
-  cardCost: function (state: GameState, cost: number): InteractiveAction {
-    return this.setHealth(state.health - cost);
-  },
-  cardWaste: function (state: GameState, reference: Card): ResponseActions {
-    return {
-      nextState: state,
-      uiActions: [UI_ACTIONS.cardWaste(reference)],
-      persistenceActions: [],
+  cardWaste: function (reference: Card): InteractiveAction {
+    return function (state: GameState) {
+      return {
+        nextState: {
+          ...state,
+          cards: state.cards.filter((card) => card.id !== reference.id),
+        },
+        uiActions: [UI_ACTIONS.cardWaste(reference)],
+        persistenceActions: [],
+      };
     };
   },
   allCardWaste: function (state: GameState): ResponseActions {
     return {
-      nextState: state,
+      nextState: { ...state, cards: [] },
       uiActions: [UI_ACTIONS.allCardWaste()],
       persistenceActions: [],
     };
@@ -84,7 +65,7 @@ export const GAME_ACTIONS = {
   setSpace: function (space: number): InteractiveAction {
     return function (state: GameState) {
       return {
-        nextState: state,
+        nextState: { ...state, space },
         uiActions: [UI_ACTIONS.setSpace(space)],
         persistenceActions: [],
       };
@@ -123,7 +104,7 @@ export const GAME_ACTIONS = {
   setPoints: function (points: number): InteractiveAction {
     return function (state: GameState) {
       return {
-        nextState: state,
+        nextState: { ...state, points },
         uiActions: [UI_ACTIONS.setPoints(points)],
         persistenceActions: [],
       };

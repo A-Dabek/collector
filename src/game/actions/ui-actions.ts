@@ -43,7 +43,7 @@ export const UI_ACTIONS = {
       type: 'cardWaste',
       update: (state) => ({
         ...state,
-        cards: state.cards.filter((card) => card !== reference),
+        cards: state.cards.filter((card) => card.id !== reference.id),
       }),
     };
   },

@@ -38,5 +38,5 @@ export class IconComponent {
   readonly rarity = input<Rarity>('common');
 
   readonly shape = computed(() => (iconCollection as any)[this.name()] || '');
-  readonly fill = computed(() => rarityColors[this.rarity()]);
+  readonly fill = computed(() => this.color() || rarityColors[this.rarity()]);
 }

@@ -1,11 +1,12 @@
 import { signal } from '@angular/core';
-import { PersistenceAction } from '../../services/persistence-action.factory';
 import { GAME_ACTIONS, ResponseActions } from '../actions/game-actions';
-import { UI_ACTIONS, UiAction } from '../actions/ui-actions';
+import { UI_ACTIONS } from '../actions/ui-actions';
 import { PLAYABLE_LIBRARY } from '../cards/access';
 import { NewGameCard } from '../cards/new-game.card';
 import { Card } from '../library/access';
-import { createCard } from './dynamic-card';
+import { FinishGameCard } from '../cards/finish-game.card';
+import { PlayableCard } from '../cards/card';
+import { rarities, Rarity } from '../../ui/rarity';
 
 export interface GameState {
   points: number;
@@ -30,74 +31,69 @@ export class GameEngine {
 
   startNewGame(): ResponseActions {
     const newGame = new NewGameCard();
-
-    const afterMath = newGame.play(this.state());
-    this.updateState(afterMath.nextState);
-    return {
-      ...afterMath,
-      uiActions: [...afterMath.uiActions, UI_ACTIONS.setState(this.state())],
-    };
+    return this.playCard(newGame);
   }
 
   play(card: Card): ResponseActions {
     const playableCard = PLAYABLE_LIBRARY[card.name];
-    const afterMath = playableCard.play(this.state());
-    this.updateState(afterMath.nextState);
-    return {
-      ...afterMath,
-      uiActions: [...afterMath.uiActions, UI_ACTIONS.setState(this.state())],
-    };
-  }
-
-  private updateState(state: GameState) {
-    this.state.set(state);
-    const newCards = this.state().cards.map((card) => {
-      const playableCard = PLAYABLE_LIBRARY[card.name];
-      console.log('state', this.state());
-      console.log(card.name, playableCard.enabled(this.state()));
-      return {
-        ...card,
-        enabled: playableCard.enabled(this.state()),
-      };
-    });
-    this.state.update((state) => ({ ...state, cards: newCards }));
+    return this.playCard(playableCard, card);
   }
 
   finishCurrentGame(): ResponseActions {
-    this.state.set({
-      ...this.initialState,
-      cards: [],
-    });
-
-    const afterMath = this.applyActions(
-      this.state(),
-      GAME_ACTIONS.gameFinish(this.state()),
-    );
-    this.state.set(afterMath.nextState);
-    return afterMath;
+    const finishGame = new FinishGameCard();
+    return this.playCard(finishGame);
   }
 
-  // TODO remove
-  private applyActions(
-    state: GameState,
-    actions: ((state: GameState) => ResponseActions)[],
-  ): ResponseActions {
-    let combinedPersistenceActions: PersistenceAction[] = [];
-    let combinedUiActions: UiAction[] = [];
-    let nextState = state;
-    actions.forEach((action) => {
-      const response = action(nextState);
-      combinedPersistenceActions = combinedPersistenceActions.concat(
-        response.persistenceActions,
-      );
-      combinedUiActions = combinedUiActions.concat(response.uiActions);
-      nextState = response.nextState;
-    });
-
-    return {
-      persistenceActions: combinedPersistenceActions,
-      uiActions: combinedUiActions,
-      nextState,
+  private playCard(playableCard: PlayableCard, card?: Card) {
+    const rarityToNumber = (rarity: Rarity): number => {
+      const index = rarities.findIndex((r) => r === rarity);
+      return index + 1; // Adding 1 to transform 0-based index to 1-based number
     };
+
+    let nextState = this.state();
+
+    let response = GAME_ACTIONS.setHealth(
+      nextState.health - (card ? rarityToNumber(card.rarity) : 0),
+    )(nextState);
+
+    nextState = response.nextState;
+
+    if (card) {
+      const response2 = GAME_ACTIONS.cardWaste(card)(nextState);
+      response = {
+        ...response2,
+        uiActions: [...response.uiActions, ...response2.uiActions],
+        persistenceActions: [
+          ...response.persistenceActions,
+          ...response2.persistenceActions,
+        ],
+      };
+    }
+
+    nextState = response.nextState;
+
+    const afterMath = playableCard.play(nextState);
+    nextState = afterMath.nextState;
+    nextState = this.updateCardsStatuses(nextState);
+    this.state.set(nextState);
+    return {
+      ...afterMath,
+      uiActions: [
+        ...response.uiActions,
+        ...afterMath.uiActions,
+        UI_ACTIONS.setState(nextState),
+      ],
+    };
+  }
+
+  private updateCardsStatuses(state: GameState) {
+    const newCards = state.cards.map((card) => {
+      const playableCard = PLAYABLE_LIBRARY[card.name];
+      return {
+        ...card,
+        enabled: playableCard.enabled(state),
+      };
+    });
+    return { ...state, cards: newCards };
   }
 }

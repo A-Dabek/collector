@@ -18,15 +18,15 @@ export class NewGameCard implements PlayableCard {
     const initialCards: Card[] = [
       findCardInLibrary('card-pickup'),
       findCardInLibrary('card-pickup'),
-      // findCardInLibrary('spikes-init'),
     ];
     return combineActions(this.initialState, [
       GAME_ACTIONS.setHealth(this.initialState.maxHealth),
+      GAME_ACTIONS.setSpace(this.initialState.space),
       GAME_ACTIONS.cardsAdd(initialCards),
     ]);
   }
 
-  enabled(state: GameState): boolean {
+  enabled(_: GameState): boolean {
     return true;
   }
 }

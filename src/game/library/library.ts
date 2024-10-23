@@ -18,35 +18,18 @@ mythic: cost6 - only super special
 - add 5 spaces with cards of every rarity
 */
 
-export type CardEffectName =
-  | 'heal'
-  | 'draw'
-  | 'expand'
-  | 'destroy'
-  | 'earn'
-  | 'shrink';
-
-export interface CardEffect {
-  name: CardEffectName;
-  repeats?: number;
-  random?: boolean;
-}
-
 export interface CardDefinition {
   rarity: Rarity;
-  effects: CardEffect[];
 }
 
 export const LIBRARY: Record<string, CardDefinition> = {
   // common
   'card-pickup': {
     rarity: 'common',
-    effects: [{ name: 'draw', repeats: 1 }],
   },
-  // pill: {
-  //   rarity: 'common',
-  //   effects: [{ name: 'heal', repeats: 1 }],
-  // },
+  pill: {
+    rarity: 'common',
+  },
   // 'paper-bag-open': {
   //   rarity: 'common',
   //   effects: [{ name: 'expand', repeats: 1 }],

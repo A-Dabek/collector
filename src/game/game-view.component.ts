@@ -79,8 +79,7 @@ import { ProgressBarComponent } from './ui/progress-bar.component';
       }
     </div>
     <div class="flex flex-wrap relative">
-      @for (item of state().cards; track item) {
-        {{ item.enabled }}
+      @for (item of state().cards; track item.id) {
         <app-card
           class="px-1"
           [card]="item"
@@ -101,7 +100,7 @@ export class GameViewComponent implements OnInit {
     health: 0,
     maxHealth: 100,
     cards: [],
-    space: 10,
+    space: 0,
     uiBlocked: false,
   });
 
@@ -110,7 +109,7 @@ export class GameViewComponent implements OnInit {
   readonly lastUiAction = signal<UiAction | undefined>(undefined);
 
   constructor() {
-    interval(1000)
+    interval(500)
       .pipe(takeUntilDestroyed())
       .subscribe(() => {
         this.nextAnimation();
@@ -151,6 +150,7 @@ export class GameViewComponent implements OnInit {
       this.state.update((state) => ({ ...state, uiBlocked: false }));
       return;
     }
+    console.log('[UI]', current);
     this.uiActions.update(([, ...rest]) => rest);
     this.state.update(current.update);
   }

@@ -2,6 +2,7 @@ import { rarities, Rarity } from '../../ui/rarity';
 import { LIBRARY } from './library';
 
 export interface Card {
+  id: number;
   name: string;
   rarity: Rarity;
   cost: number;
@@ -12,19 +13,17 @@ export interface Card {
 export function findCardInLibrary(name: string): Card {
   const libraryCard = LIBRARY[name];
   return {
+    id: Math.random(),
     name,
     cost: rarities.findIndex((item) => item === libraryCard.rarity) + 1,
     rarity: libraryCard.rarity,
     enabled: true,
-    description: libraryCard.effects
-      .map((effect) => `${effect.name} (${effect.repeats})`)
-      .join(' '),
+    description: '',
   };
 }
 
 export function getRandomCard(): Card {
   const rarity = rarities[getRarity()];
-  console.log({ rarity });
   const randomKey = findRandomCardOfRarity(rarity);
   return findCardInLibrary(randomKey);
 }
@@ -55,8 +54,6 @@ function getRarity(): number {
   };
 
   const probabilities = normalizeProbabilities(decreasingFactor);
-  console.log({ probabilities });
-
   const randomValue = Math.random();
   let cumulativeProbability = 0;
 
