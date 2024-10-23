@@ -6,6 +6,7 @@ export interface Card {
   rarity: Rarity;
   cost: number;
   description: string;
+  enabled: boolean;
 }
 
 export function findCardInLibrary(name: string): Card {
@@ -14,6 +15,7 @@ export function findCardInLibrary(name: string): Card {
     name,
     cost: rarities.findIndex((item) => item === libraryCard.rarity) + 1,
     rarity: libraryCard.rarity,
+    enabled: true,
     description: libraryCard.effects
       .map((effect) => `${effect.name} (${effect.repeats})`)
       .join(' '),

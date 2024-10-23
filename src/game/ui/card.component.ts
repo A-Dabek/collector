@@ -24,7 +24,7 @@ import { Card } from '../library/access';
         [@usage]="{ value: animate, params: {} }"
         [name]="card.name"
         [rarity]="card.rarity"
-        [size]="5"
+        [size]="card.enabled ? 5 : 3"
         (click)="onUsage()"
       />
       <div>{{ card.description }}</div>

@@ -3,10 +3,8 @@ import {
   PersistenceActionFactory,
 } from '../../services/persistence-action.factory';
 import { Card, getRandomCard } from '../library/access';
-import { combineActions } from '../logic/dynamic-card';
-import { UI_ACTIONS, UiAction } from './ui-actions';
 import { GameState } from '../logic/engine';
-import { state } from '@angular/animations';
+import { UI_ACTIONS, UiAction } from './ui-actions';
 
 export interface ResponseActions {
   persistenceActions: PersistenceAction[];
@@ -14,46 +12,56 @@ export interface ResponseActions {
   nextState: GameState;
 }
 
+export type InteractiveAction = (state: GameState) => ResponseActions;
+
 export const GAME_ACTIONS = {
   gameStart: function (
-    state: GameState,
+    initialState: GameState,
     cards: Card[],
-    maxHealth: number,
-  ): ResponseActions {
-    return combineActions(state, [
-      (state) => this.healthChange(state, maxHealth),
-      (state) => this.cardsAdd(state, cards),
-    ]);
+  ): InteractiveAction[] {
+    return [this.setHealth(initialState.maxHealth), this.cardsAdd(cards)];
   },
-  healthChange: function (state: GameState, payload: number): ResponseActions {
-    return {
-      nextState: state,
-      uiActions: [UI_ACTIONS.healthChange(payload)],
-      persistenceActions: [PersistenceActionFactory.setPoints(payload)],
+  gameFinish: function (state: GameState): InteractiveAction[] {
+    return [
+      this.setPoints(0),
+      this.setHealth(state.maxHealth),
+      this.allCardWaste,
+      this.setSpace(state.space),
+    ];
+  },
+  setHealth: function (health: number): InteractiveAction {
+    return function (state: GameState) {
+      return {
+        nextState: { ...state, health },
+        uiActions: [UI_ACTIONS.setHealth(health)],
+        persistenceActions: [PersistenceActionFactory.setHealth(health)],
+      };
     };
   },
-  cardsAdd: function (state: GameState, cards: Card[]): ResponseActions {
-    return {
-      nextState: state,
-      uiActions: cards.map(UI_ACTIONS.cardAdd),
-      persistenceActions: cards.map((card) =>
-        PersistenceActionFactory.setItem(card.name),
-      ),
+  cardsAdd: function (cards: Card[]): InteractiveAction {
+    return function (state) {
+      return {
+        nextState: { ...state, cards: [...state.cards, ...cards] },
+        uiActions: cards.map(UI_ACTIONS.cardAdd),
+        persistenceActions: cards.map((card) =>
+          PersistenceActionFactory.setItem(card.name),
+        ),
+      };
     };
   },
   cardPlay: function (
     state: GameState,
     card: Card,
     actions: ((state: GameState) => ResponseActions)[],
-  ): ResponseActions {
-    return combineActions(state, [
-      (state) => this.cardCost(state, card.cost),
+  ): InteractiveAction[] {
+    return [
+      this.cardCost(state, card.cost),
       ...actions,
       (state) => this.cardWaste(state, card),
-    ]);
+    ];
   },
-  cardCost: function (state: GameState, cost: number): ResponseActions {
-    return this.healthChange(state, -cost);
+  cardCost: function (state: GameState, cost: number): InteractiveAction {
+    return this.setHealth(state.health - cost);
   },
   cardWaste: function (state: GameState, reference: Card): ResponseActions {
     return {
@@ -62,15 +70,24 @@ export const GAME_ACTIONS = {
       persistenceActions: [],
     };
   },
-  cardsDraw: function (state: GameState, count: number): ResponseActions {
-    const randomCards = new Array(count).fill(0).map(getRandomCard);
-    return this.cardsAdd(state, randomCards);
-  },
-  spaceChange: function (state: GameState, count: number): ResponseActions {
+  allCardWaste: function (state: GameState): ResponseActions {
     return {
       nextState: state,
-      uiActions: [UI_ACTIONS.changeSpace(count)],
+      uiActions: [UI_ACTIONS.allCardWaste()],
       persistenceActions: [],
+    };
+  },
+  cardsDraw: function (count: number): InteractiveAction {
+    const randomCards = new Array(count).fill(0).map(getRandomCard);
+    return this.cardsAdd(randomCards);
+  },
+  setSpace: function (space: number): InteractiveAction {
+    return function (state: GameState) {
+      return {
+        nextState: state,
+        uiActions: [UI_ACTIONS.setSpace(space)],
+        persistenceActions: [],
+      };
     };
   },
   destroy: function (state: GameState): ResponseActions {
@@ -92,6 +109,7 @@ export const GAME_ACTIONS = {
       }
       return shuffledCards;
     }
+
     const shuffled = randomShuffleCards();
     if (count > shuffled.length) count = shuffled.length;
     return {
@@ -102,11 +120,13 @@ export const GAME_ACTIONS = {
       persistenceActions: [],
     };
   },
-  pointsChange: function (state: GameState, points: number): ResponseActions {
-    return {
-      nextState: state,
-      uiActions: [UI_ACTIONS.pointsChange(points)],
-      persistenceActions: [],
+  setPoints: function (points: number): InteractiveAction {
+    return function (state: GameState) {
+      return {
+        nextState: state,
+        uiActions: [UI_ACTIONS.setPoints(points)],
+        persistenceActions: [],
+      };
     };
   },
 };

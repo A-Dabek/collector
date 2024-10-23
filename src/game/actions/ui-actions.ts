@@ -11,21 +11,21 @@ export interface UiAction {
 }
 
 export const UI_ACTIONS = {
-  pointsChange: function (payload: number): UiAction {
+  setPoints: function (payload: number): UiAction {
     return {
-      type: 'pointsChange',
+      type: 'setPoints',
       update: (state) => ({
         ...state,
-        points: state.points + payload,
+        points: payload,
       }),
     };
   },
-  healthChange: function (payload: number): UiAction {
+  setHealth: function (health: number): UiAction {
     return {
       type: 'healthChange',
       update: (state) => ({
         ...state,
-        health: state.health + payload,
+        health,
       }),
     };
   },
@@ -47,13 +47,28 @@ export const UI_ACTIONS = {
       }),
     };
   },
-  changeSpace: function (payload: number): UiAction {
+  allCardWaste: function (): UiAction {
     return {
-      type: 'expandSpace',
+      type: 'allCardWaste',
       update: (state) => ({
         ...state,
-        space: state.space + payload,
+        cards: [],
       }),
+    };
+  },
+  setSpace: function (target: number): UiAction {
+    return {
+      type: 'setSpace',
+      update: (state) => ({
+        ...state,
+        space: target,
+      }),
+    };
+  },
+  setState: function (state: GameState): UiAction {
+    return {
+      type: 'setState',
+      update: (uiState) => ({ ...uiState, ...state }),
     };
   },
 };

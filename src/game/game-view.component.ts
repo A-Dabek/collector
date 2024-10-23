@@ -1,13 +1,14 @@
+import { animateChild } from '@angular/animations';
 import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  DestroyRef,
   inject,
   OnInit,
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { RouterLink } from '@angular/router';
 import {
   bounceInRightOnEnterAnimation,
   bounceOutLeftOnLeaveAnimation,
@@ -27,21 +28,33 @@ import { ProgressBarComponent } from './ui/progress-bar.component';
   selector: 'app-game-view',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CardComponent, ProgressBarComponent, IconComponent],
+  imports: [CardComponent, ProgressBarComponent, IconComponent, RouterLink],
   animations: [
     headShakeAnimation({ anchor: 'usage', duration: 500 }),
-    bounceInRightOnEnterAnimation({ anchor: 'enter', duration: 500 }),
-    bounceOutLeftOnLeaveAnimation({ anchor: 'leave', duration: 500 }),
+    bounceInRightOnEnterAnimation({
+      anchor: 'enter',
+      duration: 500,
+    }),
+    bounceOutLeftOnLeaveAnimation({
+      anchor: 'leave',
+      duration: 500,
+    }),
     expandOnEnterAnimation({ anchor: 'expand', duration: 500 }),
     collapseOnLeaveAnimation({ anchor: 'shrink', duration: 500 }),
   ],
   template: `
-    <div class="ms-1 text-amber-500">
-      {{
-        state().uiBlocked
-          ? 'Playing ' + (lastUiAction()?.type || '...')
-          : 'Your turn'
-      }}
+    <div class="flex mb-2">
+      <div class="flex items-center space-x-2" (click)="onRestart()">
+        <app-icon name="cycle" [style.display]="'inline'" [size]="1.5" />
+        <span>Restart</span>
+      </div>
+      <div class="ms-1 text-amber-500">
+        {{
+          state().uiBlocked
+            ? 'Playing ' + (lastUiAction()?.type || '...')
+            : 'Your turn'
+        }}
+      </div>
     </div>
     <app-bar
       class="mb-2"
@@ -67,6 +80,7 @@ import { ProgressBarComponent } from './ui/progress-bar.component';
     </div>
     <div class="flex flex-wrap relative">
       @for (item of state().cards; track item) {
+        {{ item.enabled }}
         <app-card
           class="px-1"
           [card]="item"
@@ -80,7 +94,6 @@ import { ProgressBarComponent } from './ui/progress-bar.component';
 })
 export class GameViewComponent implements OnInit {
   private readonly gameRunService = inject(GameRunService);
-  private readonly destroyRef = inject(DestroyRef);
 
   readonly state = signal<GameUiState>({
     points: 0,
@@ -89,20 +102,35 @@ export class GameViewComponent implements OnInit {
     maxHealth: 100,
     cards: [],
     space: 10,
-    uiBlocked: true,
+    uiBlocked: false,
   });
+
   readonly spaceArray = computed(() => Array(this.state().space).fill(0));
   readonly uiActions = signal<UiAction[]>([]);
   readonly lastUiAction = signal<UiAction | undefined>(undefined);
 
-  async ngOnInit() {
-    const uiActions = await this.gameRunService.init();
-    this.onNewActions(uiActions);
+  constructor() {
     interval(1000)
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(takeUntilDestroyed())
       .subscribe(() => {
-        this.nextAnimation('interval');
+        this.nextAnimation();
       });
+  }
+
+  async ngOnInit() {
+    await this.startNewGame();
+  }
+
+  private async startNewGame() {
+    const uiActions = await this.gameRunService.newGame();
+    this.onNewActions(uiActions);
+  }
+
+  async onRestart() {
+    if (this.state().uiBlocked) return;
+    const uiActions = await this.gameRunService.finish();
+    this.onNewActions(uiActions);
+    await this.startNewGame();
   }
 
   async onPlay(card: Card) {
@@ -116,8 +144,7 @@ export class GameViewComponent implements OnInit {
     this.uiActions.update((oldActions) => [...oldActions, ...actions]);
   }
 
-  nextAnimation(trigger?: any) {
-    console.log('[UI]', { trigger });
+  private nextAnimation() {
     const current = this.uiActions()[0];
     this.lastUiAction.set(current);
     if (!current) {
