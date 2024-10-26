@@ -36,7 +36,7 @@ function findRandomCardOfRarity(rarity: Rarity): string {
 }
 
 function getRarity(): number {
-  const decreasingFactor = 10;
+  const decreasingFactor = 2;
 
   const calculateBaseProbability = (factor: number): number => {
     const sumInversePowers = Array(6)

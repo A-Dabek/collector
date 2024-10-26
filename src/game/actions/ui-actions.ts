@@ -69,4 +69,18 @@ export const UI_ACTIONS = {
       update: (uiState) => ({ ...uiState, ...state }),
     };
   },
+  setEnabledStatus: function (futureCards: Card[]): UiAction {
+    return {
+      type: 'setEnabledStatus',
+      update: (uiState) => ({
+        ...uiState,
+        cards: uiState.cards.map((card) => ({
+          ...card,
+          enabled:
+            futureCards.find((futureCard) => futureCard.id === card.id)
+              ?.enabled ?? false,
+        })),
+      }),
+    };
+  },
 };

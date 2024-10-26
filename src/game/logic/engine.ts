@@ -23,7 +23,7 @@ export class GameEngine {
     maxPoints: 10,
     health: 0,
     maxHealth: 10,
-    space: 4,
+    space: 5,
     cards: [],
   };
 
@@ -67,29 +67,25 @@ export class GameEngine {
     nextState = response.nextState;
 
     if (card) {
-      const response2 = GAME_ACTIONS.cardWaste(card)(nextState);
-      response = {
-        ...response2,
-        uiActions: [...response.uiActions, ...response2.uiActions],
-        persistenceActions: [
-          ...response.persistenceActions,
-          ...response2.persistenceActions,
-        ],
-      };
+      response = this.combineActions(
+        response,
+        GAME_ACTIONS.cardWaste(card)(nextState),
+      );
     }
 
     nextState = response.nextState;
 
     const afterMath = playableCard.play(nextState);
-    nextState = afterMath.nextState;
+    response = this.combineActions(response, afterMath);
+    nextState = response.nextState;
     nextState = this.updateCardsStatuses(nextState);
     this.state.set(nextState);
     return {
-      ...afterMath,
+      ...response,
       uiActions: [
+        UI_ACTIONS.setEnabledStatus(nextState.cards),
         ...response.uiActions,
-        ...afterMath.uiActions,
-        UI_ACTIONS.setState(nextState),
+        UI_ACTIONS.setState(nextState), // FIXME this overwrite setStatusEnabled actions
       ],
     };
   }
@@ -103,5 +99,23 @@ export class GameEngine {
       };
     });
     return { ...state, cards: newCards };
+  }
+
+  private combineActions(
+    prev: ResponseActions,
+    next: ResponseActions,
+  ): ResponseActions {
+    const combinedUiActions = [...prev.uiActions, ...next.uiActions];
+
+    const combinedPersistenceActions = [
+      ...prev.persistenceActions,
+      ...next.persistenceActions,
+    ];
+
+    return {
+      nextState: next.nextState,
+      uiActions: combinedUiActions,
+      persistenceActions: combinedPersistenceActions,
+    };
   }
 }

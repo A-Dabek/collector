@@ -133,7 +133,16 @@ export class GameViewComponent implements OnInit {
 
   private onNewActions(actions: UiAction[]) {
     this.state.update((state) => ({ ...state }));
-    this.uiActions.update((oldActions) => [...oldActions, ...actions]);
+    this.uiActions.update((oldActions) => {
+      const allActions = [...oldActions, ...actions];
+      const enabledActions = allActions.filter(
+        (action) => action.type === 'setEnabledStatus',
+      );
+      const otherActions = allActions.filter(
+        (action) => action.type !== 'setEnabledStatus',
+      );
+      return [...enabledActions, ...otherActions];
+    });
   }
 
   private nextAnimation() {
@@ -146,5 +155,12 @@ export class GameViewComponent implements OnInit {
     console.log('[UI]', current);
     this.uiActions.update(([, ...rest]) => rest);
     this.state.update(current.update);
+
+    // Continue applying actions of type 'setEnabledStatus'
+    while (this.uiActions()[0]?.type === 'setEnabledStatus') {
+      const nextAction = this.uiActions()[0];
+      this.uiActions.update(([, ...nextRest]) => nextRest);
+      this.state.update(nextAction.update);
+    }
   }
 }
