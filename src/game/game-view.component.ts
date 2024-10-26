@@ -21,6 +21,7 @@ import { GameRunService } from '../services/game-run.service';
 import { IconComponent } from '../ui/icon.component';
 import { GameUiState, UiAction } from './actions/ui-actions';
 import { Card } from './library/access';
+import { GameEngine } from './logic/engine';
 import { CardComponent } from './ui/card.component';
 import { ProgressBarComponent } from './ui/progress-bar.component';
 
@@ -50,7 +51,7 @@ import { ProgressBarComponent } from './ui/progress-bar.component';
       </div>
       <div class="ms-1 text-amber-500">
         {{
-          state().uiBlocked
+          lastUiAction()
             ? 'Playing ' + (lastUiAction()?.type || '...')
             : 'Your turn'
         }}
@@ -95,13 +96,7 @@ export class GameViewComponent implements OnInit {
   private readonly gameRunService = inject(GameRunService);
 
   readonly state = signal<GameUiState>({
-    points: 0,
-    maxPoints: 100,
-    health: 0,
-    maxHealth: 100,
-    cards: [],
-    space: 0,
-    uiBlocked: false,
+    ...GameEngine.initialState,
   });
 
   readonly spaceArray = computed(() => Array(this.state().space).fill(0));
@@ -126,20 +121,18 @@ export class GameViewComponent implements OnInit {
   }
 
   async onRestart() {
-    if (this.state().uiBlocked) return;
     const uiActions = await this.gameRunService.finish();
     this.onNewActions(uiActions);
     await this.startNewGame();
   }
 
   async onPlay(card: Card) {
-    if (this.state().uiBlocked) return;
     const uiActions = await this.gameRunService.play(card);
     this.onNewActions(uiActions);
   }
 
   private onNewActions(actions: UiAction[]) {
-    this.state.update((state) => ({ ...state, uiBlocked: true }));
+    this.state.update((state) => ({ ...state }));
     this.uiActions.update((oldActions) => [...oldActions, ...actions]);
   }
 
@@ -147,7 +140,7 @@ export class GameViewComponent implements OnInit {
     const current = this.uiActions()[0];
     this.lastUiAction.set(current);
     if (!current) {
-      this.state.update((state) => ({ ...state, uiBlocked: false }));
+      this.state.update((state) => ({ ...state }));
       return;
     }
     console.log('[UI]', current);

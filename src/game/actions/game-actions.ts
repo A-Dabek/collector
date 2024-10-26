@@ -94,10 +94,11 @@ export const GAME_ACTIONS = {
     const shuffled = randomShuffleCards();
     if (count > shuffled.length) count = shuffled.length;
     return {
-      nextState: state,
-      uiActions: Array(count)
-        .fill(0)
-        .map((_, index) => UI_ACTIONS.cardWaste(shuffled[0])),
+      nextState: {
+        ...state,
+        cards: state.cards.filter((card) => card.id !== shuffled[0].id),
+      },
+      uiActions: [UI_ACTIONS.cardWaste(shuffled[0])],
       persistenceActions: [],
     };
   },

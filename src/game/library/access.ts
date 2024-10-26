@@ -16,9 +16,8 @@ export function findCardInLibrary(name: string): Card {
     id: Math.random(),
     name,
     cost: rarities.findIndex((item) => item === libraryCard.rarity) + 1,
-    rarity: libraryCard.rarity,
     enabled: true,
-    description: '',
+    ...libraryCard,
   };
 }
 

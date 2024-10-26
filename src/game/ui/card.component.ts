@@ -38,7 +38,7 @@ import { interval } from 'rxjs';
         [size]="card.enabled ? 5 : 4"
         (click)="onUsage()"
       />
-      <div>{{ card.description }}</div>
+      <div class="text-xs">{{ card.description }}</div>
     </div>
   `,
 })

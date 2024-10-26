@@ -20,60 +20,63 @@ mythic: cost6 - only super special
 
 export interface CardDefinition {
   rarity: Rarity;
+  description: string;
 }
 
 export const LIBRARY: Record<string, CardDefinition> = {
   // common
   'card-pickup': {
     rarity: 'common',
+    description: 'Draw 2',
   },
   pill: {
     rarity: 'common',
+    description: 'Heal 5',
   },
-  // 'paper-bag-open': {
-  //   rarity: 'common',
-  //   effects: [{ name: 'expand', repeats: 1 }],
-  // },
-  // 'spikes-init': {
-  //   rarity: 'common',
-  //   effects: [{ name: 'destroy', random: true, repeats: 1 }],
-  // },
-  // token: {
-  //   rarity: 'common',
-  //   effects: [{ name: 'earn', repeats: 1 }],
-  // },
+  'paper-bag-open': {
+    rarity: 'common',
+    description: 'Expand 1',
+  },
+  'spikes-init': {
+    rarity: 'common',
+    description: 'Destroy random 1',
+  },
+  token: {
+    rarity: 'common',
+    description: 'Earn 1',
+  },
 
   // uncommon - single effect
-  // 'paper-bag-crumpled': {
-  //   rarity: 'uncommon',
-  //   effects: [{ name: 'shrink', random: true, repeats: 1 }],
-  // },
+  'paper-bag-crumpled': {
+    rarity: 'uncommon',
+    description: 'Shrink 1',
+  },
   // 'hammer-break': {
   //   rarity: 'uncommon',
   //   effects: [{ name: 'destroy' }],
   // },
 
   // uncommon - single common effect x2
-  // 'card-2-diamonds': {
-  //   rarity: 'uncommon',
-  //   effects: [{ name: 'draw', repeats: 2 }],
-  // },
-  // medicines: {
-  //   rarity: 'uncommon',
-  //   effects: [{ name: 'heal', repeats: 2 }],
-  // },
-  // 'shoulder-bag': {
-  //   rarity: 'uncommon',
-  //   effects: [{ name: 'expand', repeats: 2 }],
-  // },
-  // 'spikes-half': {
-  //   rarity: 'uncommon',
-  //   effects: [{ name: 'destroy', random: true, repeats: 2 }],
-  // },
-  // 'two-coins': {
-  //   rarity: 'uncommon',
-  //   effects: [{ name: 'earn', repeats: 2 }],
-  // },
+  'card-2-diamonds': {
+    rarity: 'uncommon',
+    description: 'Draw 3',
+  },
+  medicines: {
+    rarity: 'uncommon',
+    description: 'Heal 10',
+  },
+  'shoulder-bag': {
+    rarity: 'uncommon',
+    description: 'Expand 2',
+  },
+  'spikes-half': {
+    rarity: 'uncommon',
+    description: 'Destroy random 2',
+  },
+  'two-coins': {
+    rarity: 'uncommon',
+    description: 'Earn 2',
+  },
 
   // rare
 

@@ -18,23 +18,31 @@ export interface GameState {
 }
 
 export class GameEngine {
-  private readonly initialState: GameState = {
+  static readonly initialState: GameState = {
     points: 0,
-    maxPoints: 100,
+    maxPoints: 10,
     health: 0,
-    maxHealth: 100,
-    space: 10,
+    maxHealth: 10,
+    space: 4,
     cards: [],
   };
 
-  readonly state = signal<GameState>(this.initialState);
+  readonly state = signal<GameState>(GameEngine.initialState);
 
   startNewGame(): ResponseActions {
     const newGame = new NewGameCard();
     return this.playCard(newGame);
   }
 
-  play(card: Card): ResponseActions {
+  play(id: number): ResponseActions {
+    const card = this.state().cards.find((card) => card.id === id);
+    if (!card || !card.enabled) {
+      return {
+        nextState: this.state(),
+        uiActions: [],
+        persistenceActions: [],
+      };
+    }
     const playableCard = PLAYABLE_LIBRARY[card.name];
     return this.playCard(playableCard, card);
   }

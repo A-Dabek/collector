@@ -1,5 +1,4 @@
-import { inject, Injectable, signal } from '@angular/core';
-import { GameUiState } from '../game/actions/ui-actions';
+import { inject, Injectable } from '@angular/core';
 import { Card } from '../game/library/access';
 import { GameEngine } from '../game/logic/engine';
 import { GameRunPersistenceService } from './game-run-persistence.service';
@@ -24,7 +23,7 @@ export class GameRunService {
   }
 
   async play(card: Card) {
-    const response = this.engine.play(card);
+    const response = this.engine.play(card.id);
     // await this.persistenceService.persist(response.persistenceActions);
 
     return response.uiActions;
