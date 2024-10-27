@@ -16,6 +16,18 @@ mythic: cost6 - only super special
 - re-roll all cards
 - shrink spaces with each distinct rarity
 - add 5 spaces with cards of every rarity
+
+- plain-padlock - lock health for next card
+- goldfish/djinn - wishes
+- fisherman - random fish?
+- exhume a card
+- note with a sword - complete a task for points
+- incognito - get a card without info
+- time limit - lose hp? every second
+- tick - drains life?
+- ouroboros - play a card infitenly
+- shop - buy a card for points
+- parrot - same effect as previous
 */
 
 export interface CardDefinition {

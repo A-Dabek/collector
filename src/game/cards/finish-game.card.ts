@@ -1,15 +1,20 @@
-import { GAME_ACTIONS, ResponseActions } from '../actions/game-actions';
+import { ResponseActions } from '../actions/game-actions';
 import { combineActions } from '../logic/dynamic-card';
 import { GameState } from '../logic/engine';
 import { PlayableCard } from './card';
+import { SetHealthAction } from '../actions/set-health.action';
+import { SetSpaceAction } from '../actions/set-space.action';
+import { SetPointsAction } from '../actions/set-points.action';
+import { CardWasteAllAction } from '../actions/card-waste-all.action';
+import { Card } from '../library/access';
 
 export class FinishGameCard implements PlayableCard {
-  play(state: GameState): ResponseActions {
+  play(state: GameState, card: Card): ResponseActions {
     return combineActions(state, [
-      GAME_ACTIONS.setPoints(0),
-      GAME_ACTIONS.setHealth(state.maxHealth),
-      GAME_ACTIONS.allCardWaste,
-      GAME_ACTIONS.setSpace(0),
+      new SetPointsAction(0),
+      new SetHealthAction(state.maxHealth),
+      new CardWasteAllAction(),
+      new SetSpaceAction(0),
     ]);
   }
 

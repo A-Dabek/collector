@@ -1,10 +1,12 @@
-import { GAME_ACTIONS, ResponseActions } from '../../actions/game-actions';
+import { ResponseActions } from '../../actions/game-actions';
 import { GameState } from '../../logic/engine';
 import { PlayableCard } from '../card';
+import { CardDrawAction } from '../../actions/card-draw.action';
+import { Card } from '../../library/access';
 
 export class CardPickupCard implements PlayableCard {
-  play(state: GameState): ResponseActions {
-    return GAME_ACTIONS.cardsDraw(2)(state);
+  play(state: GameState, card: Card): ResponseActions {
+    return new CardDrawAction(2).next(state);
   }
 
   enabled(state: GameState): boolean {

@@ -52,7 +52,7 @@ export class CardComponent {
   readonly card = input<Card>();
   readonly usage = output();
   animate = false;
-  animateEnabled = computed(() => CardComponent.timerS());
+  readonly animateEnabled = computed(() => CardComponent.timerS());
 
   onUsage() {
     if (this.card()?.enabled) {

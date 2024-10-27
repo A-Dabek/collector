@@ -1,12 +1,17 @@
 import { signal } from '@angular/core';
-import { GAME_ACTIONS, ResponseActions } from '../actions/game-actions';
-import { UI_ACTIONS } from '../actions/ui-actions';
 import { PLAYABLE_LIBRARY } from '../cards/access';
 import { NewGameCard } from '../cards/new-game.card';
 import { Card } from '../library/access';
 import { FinishGameCard } from '../cards/finish-game.card';
 import { PlayableCard } from '../cards/card';
 import { rarities, Rarity } from '../../ui/rarity';
+import { GameAction, ResponseActions } from '../actions/game-actions';
+import { SetEnabledStatusAction } from '../actions/set-enabled-status.action';
+import { SetStateAction } from '../actions/set-state.action';
+import { CardWasteAction } from '../actions/card-waste.action';
+import { AddHealthAction } from '../actions/add-health.action';
+import { CostHealthAction } from '../actions/cost-health.action';
+import { combineActions } from './dynamic-card';
 
 export interface GameState {
   points: number;
@@ -53,39 +58,25 @@ export class GameEngine {
   }
 
   private playCard(playableCard: PlayableCard, card?: Card) {
-    const rarityToNumber = (rarity: Rarity): number => {
-      const index = rarities.findIndex((r) => r === rarity);
-      return index + 1; // Adding 1 to transform 0-based index to 1-based number
-    };
-
     let nextState = this.state();
 
-    let response = GAME_ACTIONS.setHealth(
-      nextState.health - (card ? rarityToNumber(card.rarity) : 0),
-    )(nextState);
+    let response = card
+      ? combineActions(nextState, [
+          new CostHealthAction(card.rarity),
+          new CardWasteAction([card]),
+          { next: (state) => playableCard.play(state, card) } as GameAction,
+        ])
+      : playableCard.play(nextState, {} as Card);
 
-    nextState = response.nextState;
-
-    if (card) {
-      response = this.combineActions(
-        response,
-        GAME_ACTIONS.cardWaste(card)(nextState),
-      );
-    }
-
-    nextState = response.nextState;
-
-    const afterMath = playableCard.play(nextState);
-    response = this.combineActions(response, afterMath);
     nextState = response.nextState;
     nextState = this.updateCardsStatuses(nextState);
     this.state.set(nextState);
     return {
       ...response,
       uiActions: [
-        UI_ACTIONS.setEnabledStatus(nextState.cards),
+        new SetEnabledStatusAction(nextState.cards),
         ...response.uiActions,
-        UI_ACTIONS.setState(nextState), // FIXME this overwrite setStatusEnabled actions
+        new SetStateAction(nextState), // FIXME this overwrite setStatusEnabled actions
       ],
     };
   }

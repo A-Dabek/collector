@@ -1,17 +1,17 @@
 import { PersistenceAction } from '../../services/persistence-action.factory';
-import { InteractiveAction, ResponseActions } from '../actions/game-actions';
+import { GameAction, ResponseActions } from '../actions/game-actions';
 import { UiAction } from '../actions/ui-actions';
 import { GameState } from './engine';
 
 export function combineActions(
   state: GameState,
-  actions: InteractiveAction[],
+  actions: GameAction[],
 ): ResponseActions {
   let combinedPersistenceActions: PersistenceAction[] = [];
   let combinedUiActions: UiAction[] = [];
   let nextState = state;
   actions.forEach((action) => {
-    const response = action(nextState);
+    const response = action.next(nextState);
     combinedPersistenceActions = combinedPersistenceActions.concat(
       response.persistenceActions,
     );

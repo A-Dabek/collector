@@ -1,4 +1,3 @@
-import { animateChild } from '@angular/animations';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -24,6 +23,7 @@ import { Card } from './library/access';
 import { GameEngine } from './logic/engine';
 import { CardComponent } from './ui/card.component';
 import { ProgressBarComponent } from './ui/progress-bar.component';
+import { SetEnabledStatusAction } from './actions/set-enabled-status.action';
 
 @Component({
   selector: 'app-game-view',
@@ -52,7 +52,7 @@ import { ProgressBarComponent } from './ui/progress-bar.component';
       <div class="ms-1 text-amber-500">
         {{
           lastUiAction()
-            ? 'Playing ' + (lastUiAction()?.type || '...')
+            ? 'Playing ' + (lastUiAction()?.constructor?.name || '...')
             : 'Your turn'
         }}
       </div>
@@ -71,7 +71,7 @@ import { ProgressBarComponent } from './ui/progress-bar.component';
     <div class="flex flex-wrap absolute opacity-20">
       @for (space of spaceArray(); let i = $index; track i) {
         <app-icon
-          class="px-1 py-5"
+          class="px-1 py-5 "
           name="stack"
           [size]="5"
           [@expand]
@@ -136,10 +136,10 @@ export class GameViewComponent implements OnInit {
     this.uiActions.update((oldActions) => {
       const allActions = [...oldActions, ...actions];
       const enabledActions = allActions.filter(
-        (action) => action.type === 'setEnabledStatus',
+        (action) => action instanceof SetEnabledStatusAction,
       );
       const otherActions = allActions.filter(
-        (action) => action.type !== 'setEnabledStatus',
+        (action) => !(action instanceof SetEnabledStatusAction),
       );
       return [...enabledActions, ...otherActions];
     });
@@ -154,10 +154,10 @@ export class GameViewComponent implements OnInit {
     }
     console.log('[UI]', current);
     this.uiActions.update(([, ...rest]) => rest);
-    this.state.update(current.update);
+    this.state.update((state) => current.update(state));
 
     // Continue applying actions of type 'setEnabledStatus'
-    while (this.uiActions()[0]?.type === 'setEnabledStatus') {
+    while (this.uiActions()[0] instanceof SetEnabledStatusAction) {
       const nextAction = this.uiActions()[0];
       this.uiActions.update(([, ...nextRest]) => nextRest);
       this.state.update(nextAction.update);
