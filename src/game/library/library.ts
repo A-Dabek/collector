@@ -51,10 +51,10 @@ export const LIBRARY: Record<string, CardDefinition> = {
     rarity: 'uncommon',
     description: 'Shrink 1',
   },
-  // 'hammer-break': {
-  //   rarity: 'uncommon',
-  //   effects: [{ name: 'destroy' }],
-  // },
+  'hammer-break': {
+    rarity: 'uncommon',
+    description: 'Destroy 1',
+  },
 
   // uncommon - single common effect x2
   'card-2-diamonds': {

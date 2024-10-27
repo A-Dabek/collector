@@ -5,6 +5,7 @@ import { PillCard } from './common/pill.card';
 import { SpikesInitCard } from './common/spikes-init.card';
 import { TokenCard } from './common/token.card';
 import { Card2DiamondsCard } from './uncommon/card-2-diamonds.card';
+import { HammerBreakCard } from './uncommon/hammer-break.card';
 import { MedicinesCard } from './uncommon/medicines.card';
 import { PaperBagCrumpledCard } from './uncommon/paper-bag-crumpled.card';
 import { ShoulderBagCard } from './uncommon/shoulder-bag.card';
@@ -26,4 +27,5 @@ export const PLAYABLE_LIBRARY: Record<string, PlayableCard> = {
   'shoulder-bag': new ShoulderBagCard(),
   'spikes-half': new SpikesHalfCard(),
   'two-coins': new TwoCoinsCard(),
+  'hammer-break': new HammerBreakCard(),
 };
