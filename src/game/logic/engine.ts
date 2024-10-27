@@ -12,6 +12,7 @@ import { CardWasteAction } from '../actions/card-waste.action';
 import { AddHealthAction } from '../actions/add-health.action';
 import { CostHealthAction } from '../actions/cost-health.action';
 import { combineActions } from './dynamic-card';
+import { CardPlayAction } from '../actions/card-play.action';
 
 export interface GameState {
   points: number;
@@ -63,7 +64,7 @@ export class GameEngine {
     let response = card
       ? combineActions(nextState, [
           new CostHealthAction(card.rarity),
-          new CardWasteAction([card]),
+          new CardPlayAction([card]),
           { next: (state) => playableCard.play(state, card) } as GameAction,
         ])
       : playableCard.play(nextState, {} as Card);

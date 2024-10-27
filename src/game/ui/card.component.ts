@@ -8,7 +8,19 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { headShakeAnimation, heartBeatAnimation } from 'angular-animations';
+import {
+  fadeOutUpAnimation,
+  fadeOutUpBigAnimation,
+  headShakeAnimation,
+  heartBeatAnimation,
+  slideInUpAnimation,
+  slideOutUpAnimation,
+  swingAnimation,
+  wobbleAnimation,
+  pulseAnimation,
+  hingeAnimation,
+  zoomOutAnimation,
+} from 'angular-animations';
 import { IconComponent } from '../../ui/icon.component';
 import { Card } from '../library/access';
 import { interval } from 'rxjs';
@@ -19,23 +31,30 @@ import { interval } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [IconComponent, NgIf],
   animations: [
-    headShakeAnimation({ anchor: 'usage', duration: 500 }),
-    heartBeatAnimation({ anchor: 'enabled', duration: 500, scale: 1.1 }),
+    pulseAnimation({ anchor: 'enabled', duration: 500 }),
+    pulseAnimation({ anchor: 'target', duration: 500, scale: 1.1 }),
+    hingeAnimation({
+      anchor: 'targeting',
+      duration: 500,
+    }),
   ],
   template: `
     <div *ngIf="card() as card" class="text-center">
       <div>{{ card.name }}</div>
       <app-icon
         class="cursor-pointer"
-        [@usage]="{ value: animate, params: {} }"
-        [@enabled]="{
-          value: card.enabled && animateEnabled(),
+        [@target]="{
+          value: card.targetable && animateEnabled(),
+          params: {},
+        }"
+        [@targeting]="{
+          value: card.targeting && animateEnabled(),
           params: {},
         }"
         [name]="card.name"
         [color]="card.enabled ? '' : '#707070'"
         [rarity]="card.rarity"
-        [size]="card.enabled ? 5 : 4"
+        [size]="5"
         (click)="onUsage()"
       />
       <div class="text-xs">{{ card.description }}</div>
@@ -53,6 +72,12 @@ export class CardComponent {
   readonly usage = output();
   animate = false;
   readonly animateEnabled = computed(() => CardComponent.timerS());
+
+  readonly isTarget = computed(() => this.card()?.targetable);
+  readonly isTargeting = computed(() => this.card()?.targeting);
+  readonly isEnabled = computed(
+    () => this.card()?.enabled && !this.isTarget() && !this.isTargeting(),
+  );
 
   onUsage() {
     if (this.card()?.enabled) {

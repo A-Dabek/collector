@@ -14,9 +14,9 @@ export class NewGameCard implements PlayableCard {
 
   play(state: GameState, card: Card): ResponseActions {
     const initialCards: Card[] = [
-      // findCardInLibrary('hammer-break'),
+      findCardInLibrary('hammer-break'),
       findCardInLibrary('card-pickup'),
-      findCardInLibrary('card-pickup'),
+      // findCardInLibrary('card-pickup'),
     ];
     return combineActions(this.initialState, [
       new SetHealthAction(this.initialState.maxHealth),

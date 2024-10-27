@@ -1,95 +1,40 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  computed,
   inject,
   OnInit,
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { RouterLink } from '@angular/router';
-import {
-  bounceInRightOnEnterAnimation,
-  bounceOutLeftOnLeaveAnimation,
-  collapseOnLeaveAnimation,
-  expandOnEnterAnimation,
-  headShakeAnimation,
-} from 'angular-animations';
-import { interval } from 'rxjs';
+import { BehaviorSubject, interval, startWith, switchMap } from 'rxjs';
 import { GameRunService } from '../services/game-run.service';
-import { IconComponent } from '../ui/icon.component';
 import { GameUiState, UiAction } from './actions/ui-actions';
 import { Card } from './library/access';
 import { GameEngine } from './logic/engine';
-import { CardComponent } from './ui/card.component';
-import { ProgressBarComponent } from './ui/progress-bar.component';
 import { SetEnabledStatusAction } from './actions/set-enabled-status.action';
+import { CardPlayAction } from './actions/card-play.action';
+import { GameMenuComponent } from './ui/menu.component';
+import { GameBarsComponent } from './ui/bars.component';
+import { GameBoardComponent } from './ui/board.component';
 
 @Component({
   selector: 'app-game-view',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CardComponent, ProgressBarComponent, IconComponent, RouterLink],
-  animations: [
-    headShakeAnimation({ anchor: 'usage', duration: 500 }),
-    bounceInRightOnEnterAnimation({
-      anchor: 'enter',
-      duration: 500,
-    }),
-    bounceOutLeftOnLeaveAnimation({
-      anchor: 'leave',
-      duration: 500,
-    }),
-    expandOnEnterAnimation({ anchor: 'expand', duration: 500 }),
-    collapseOnLeaveAnimation({ anchor: 'shrink', duration: 500 }),
-  ],
+  imports: [GameMenuComponent, GameBarsComponent, GameBoardComponent],
   template: `
-    <div class="flex mb-2">
-      <div class="flex items-center space-x-2" (click)="onRestart()">
-        <app-icon name="cycle" [style.display]="'inline'" [size]="1.5" />
-        <span>Restart</span>
-      </div>
-      <div class="ms-1 text-amber-500">
-        {{
-          lastUiAction()
-            ? 'Playing ' + (lastUiAction()?.constructor?.name || '...')
-            : 'Your turn'
-        }}
-      </div>
-    </div>
-    <app-bar
-      class="mb-2"
-      [current]="state().points"
-      [max]="state().maxPoints"
-      styleClass="bg-yellow-400"
+    <app-game-menu [lastUiAction]="lastUiAction()" (restart)="onRestart()" />
+    <app-game-bars
+      [points]="state().points"
+      [maxPoints]="state().maxPoints"
+      [health]="state().health"
+      [maxHealth]="state().maxHealth"
     />
-    <app-bar
-      [current]="state().health"
-      [max]="state().maxHealth"
-      styleClass="bg-red-300"
+    <app-game-board
+      [space]="state().space"
+      [cards]="state().cards"
+      (play)="onPlay($event)"
     />
-    <div class="flex flex-wrap absolute opacity-20">
-      @for (space of spaceArray(); let i = $index; track i) {
-        <app-icon
-          class="px-1 py-5 "
-          name="stack"
-          [size]="5"
-          [@expand]
-          [@shrink]
-        />
-      }
-    </div>
-    <div class="flex flex-wrap relative">
-      @for (item of state().cards; track item.id) {
-        <app-card
-          class="px-1"
-          [card]="item"
-          (usage)="onPlay(item)"
-          [@enter]
-          [@leave]
-        />
-      }
-    </div>
   `,
 })
 export class GameViewComponent implements OnInit {
@@ -99,13 +44,16 @@ export class GameViewComponent implements OnInit {
     ...GameEngine.initialState,
   });
 
-  readonly spaceArray = computed(() => Array(this.state().space).fill(0));
   readonly uiActions = signal<UiAction[]>([]);
   readonly lastUiAction = signal<UiAction | undefined>(undefined);
+  private readonly now$ = new BehaviorSubject(0);
 
   constructor() {
-    interval(500)
-      .pipe(takeUntilDestroyed())
+    this.now$
+      .pipe(
+        takeUntilDestroyed(),
+        switchMap(() => interval(500).pipe(startWith(0))),
+      )
       .subscribe(() => {
         this.nextAnimation();
       });
@@ -136,13 +84,16 @@ export class GameViewComponent implements OnInit {
     this.uiActions.update((oldActions) => {
       const allActions = [...oldActions, ...actions];
       const enabledActions = allActions.filter(
-        (action) => action instanceof SetEnabledStatusAction,
+        (action) =>
+          action instanceof SetEnabledStatusAction ||
+          action instanceof CardPlayAction,
       );
       const otherActions = allActions.filter(
-        (action) => !(action instanceof SetEnabledStatusAction),
+        (action) => !enabledActions.includes(action as any),
       );
       return [...enabledActions, ...otherActions];
     });
+    this.now$.next(0);
   }
 
   private nextAnimation() {
@@ -157,10 +108,13 @@ export class GameViewComponent implements OnInit {
     this.state.update((state) => current.update(state));
 
     // Continue applying actions of type 'setEnabledStatus'
-    while (this.uiActions()[0] instanceof SetEnabledStatusAction) {
+    while (
+      this.uiActions()[0] instanceof SetEnabledStatusAction ||
+      this.uiActions()[0] instanceof CardPlayAction
+    ) {
       const nextAction = this.uiActions()[0];
       this.uiActions.update(([, ...nextRest]) => nextRest);
-      this.state.update(nextAction.update);
+      this.state.update((state) => nextAction.update(state));
     }
   }
 }
