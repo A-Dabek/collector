@@ -16,6 +16,7 @@ import { CardPlayAction } from './actions/card-play.action';
 import { GameMenuComponent } from './ui/menu.component';
 import { GameBarsComponent } from './ui/bars.component';
 import { GameBoardComponent } from './ui/board.component';
+import { SetStateAction } from './actions/set-state.action';
 
 @Component({
   selector: 'app-game-view',
@@ -88,10 +89,19 @@ export class GameViewComponent implements OnInit {
           action instanceof SetEnabledStatusAction ||
           action instanceof CardPlayAction,
       );
-      const otherActions = allActions.filter(
-        (action) => !enabledActions.includes(action as any),
+      const finalizeStateAction = allActions.filter(
+        (action) => action instanceof SetStateAction,
       );
-      return [...enabledActions, ...otherActions];
+      const otherActions = allActions.filter(
+        (action) =>
+          !enabledActions.includes(action as any) &&
+          !finalizeStateAction.includes(action as any),
+      );
+      return [
+        ...enabledActions,
+        ...otherActions,
+        ...finalizeStateAction.slice(-1),
+      ];
     });
     this.now$.next(0);
   }

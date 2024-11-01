@@ -3,25 +3,22 @@ import { GameAction, ResponseActions } from './game-actions';
 import { GameUiState } from './ui-actions';
 import { Card } from '../library/access';
 import { PlayableCard } from '../cards/card';
-import { CostHealthAction } from './cost-health.action';
 import { combineActions } from '../logic/dynamic-card';
+import { TargetAction } from './target.action';
 
-export class CardPlayAction implements GameAction {
-  private readonly costHealth: CostHealthAction;
+export class CardTargetAction implements GameAction {
+  private readonly targetAction: TargetAction;
 
   constructor(
-    private readonly card: Card,
-    private readonly playableCard: PlayableCard,
+    private readonly targetDest: Card,
+    private readonly targetSource: Card,
+    private readonly playableTargetSource: PlayableCard,
   ) {
-    this.costHealth = new CostHealthAction(this.card.rarity);
+    this.targetAction = new TargetAction(targetDest);
   }
 
   update(state: GameUiState): GameUiState {
-    state = this.costHealth.update(state);
-    return {
-      ...state,
-      cards: state.cards.filter((card) => card.id != this.card.id),
-    };
+    return this.targetAction.update(state);
   }
 
   next(state: GameState): ResponseActions {
@@ -34,7 +31,8 @@ export class CardPlayAction implements GameAction {
         }),
       } as GameAction,
       {
-        next: (state) => this.playableCard.play(state, this.card),
+        next: (state) =>
+          this.playableTargetSource.target!(state, this.targetSource),
       } as GameAction,
     ]);
   }

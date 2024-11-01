@@ -3,8 +3,8 @@ import { GameAction, ResponseActions } from './game-actions';
 import { GameUiState } from './ui-actions';
 import { Card } from '../library/access';
 
-export class StartTargetingAction implements GameAction {
-  constructor(private readonly source: Card) {}
+export class TargetAction implements GameAction {
+  constructor(private readonly target: Card) {}
 
   update(state: GameUiState): GameUiState {
     return {
@@ -12,8 +12,7 @@ export class StartTargetingAction implements GameAction {
       cards: state.cards.map((card) => {
         return {
           ...card,
-          targetSource: card.id === this.source.id,
-          targetCandidate: !card.targetDest && card.id !== this.source.id,
+          targetDest: card.id === this.target.id,
         };
       }),
     };

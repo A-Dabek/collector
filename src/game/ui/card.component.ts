@@ -44,11 +44,11 @@ import { interval } from 'rxjs';
       <app-icon
         class="cursor-pointer"
         [@target]="{
-          value: card.targetable && animateEnabled(),
+          value: card.targetCandidate && animateEnabled(),
           params: {},
         }"
         [@targeting]="{
-          value: card.targeting && animateEnabled(),
+          value: card.targetSource && animateEnabled(),
           params: {},
         }"
         [name]="card.name"
@@ -73,8 +73,8 @@ export class CardComponent {
   animate = false;
   readonly animateEnabled = computed(() => CardComponent.timerS());
 
-  readonly isTarget = computed(() => this.card()?.targetable);
-  readonly isTargeting = computed(() => this.card()?.targeting);
+  readonly isTarget = computed(() => this.card()?.targetCandidate);
+  readonly isTargeting = computed(() => this.card()?.targetSource);
   readonly isEnabled = computed(
     () => this.card()?.enabled && !this.isTarget() && !this.isTargeting(),
   );

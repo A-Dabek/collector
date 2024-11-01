@@ -8,8 +8,9 @@ export interface Card {
   cost: number;
   description: string;
   enabled: boolean;
-  targeting: boolean;
-  targetable: boolean;
+  targetSource: boolean;
+  targetCandidate: boolean;
+  targetDest: boolean;
 }
 
 export function findCardInLibrary(name: string): Card {
@@ -19,8 +20,9 @@ export function findCardInLibrary(name: string): Card {
     name,
     cost: rarities.findIndex((item) => item === libraryCard.rarity) + 1,
     enabled: true,
-    targetable: false,
-    targeting: false,
+    targetCandidate: false,
+    targetSource: false,
+    targetDest: false,
     ...libraryCard,
   };
 }

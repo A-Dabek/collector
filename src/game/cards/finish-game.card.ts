@@ -6,10 +6,9 @@ import { SetHealthAction } from '../actions/set-health.action';
 import { SetSpaceAction } from '../actions/set-space.action';
 import { SetPointsAction } from '../actions/set-points.action';
 import { CardWasteAllAction } from '../actions/card-waste-all.action';
-import { Card } from '../library/access';
 
 export class FinishGameCard implements PlayableCard {
-  play(state: GameState, card: Card): ResponseActions {
+  play(state: GameState): ResponseActions {
     return combineActions(state, [
       new SetPointsAction(0),
       new SetHealthAction(state.maxHealth),

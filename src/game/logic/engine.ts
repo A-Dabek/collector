@@ -4,15 +4,11 @@ import { NewGameCard } from '../cards/new-game.card';
 import { Card } from '../library/access';
 import { FinishGameCard } from '../cards/finish-game.card';
 import { PlayableCard } from '../cards/card';
-import { rarities, Rarity } from '../../ui/rarity';
 import { GameAction, ResponseActions } from '../actions/game-actions';
 import { SetEnabledStatusAction } from '../actions/set-enabled-status.action';
 import { SetStateAction } from '../actions/set-state.action';
-import { CardWasteAction } from '../actions/card-waste.action';
-import { AddHealthAction } from '../actions/add-health.action';
-import { CostHealthAction } from '../actions/cost-health.action';
-import { combineActions } from './dynamic-card';
 import { CardPlayAction } from '../actions/card-play.action';
+import { CardTargetAction } from '../actions/card-target.action';
 
 export interface GameState {
   points: number;
@@ -40,36 +36,50 @@ export class GameEngine {
     return this.playCard(newGame);
   }
 
-  play(id: number): ResponseActions {
-    const card = this.state().cards.find((card) => card.id === id);
-    if (!card || !card.enabled) {
-      return {
-        nextState: this.state(),
-        uiActions: [],
-        persistenceActions: [],
-      };
-    }
-    const playableCard = PLAYABLE_LIBRARY[card.name];
-    return this.playCard(playableCard, card);
-  }
-
   finishCurrentGame(): ResponseActions {
     const finishGame = new FinishGameCard();
     return this.playCard(finishGame);
   }
 
-  private playCard(playableCard: PlayableCard, card?: Card) {
-    let nextState = this.state();
+  play(id: number): ResponseActions {
+    const card = this.state().cards.find((card) => card.id === id);
+    if (!card || !card.enabled) {
+      return this.playCard(new SetStateAction(this.state()));
+    }
 
-    let response = card
-      ? combineActions(nextState, [
-          new CostHealthAction(card.rarity),
-          new CardPlayAction([card]),
-          { next: (state) => playableCard.play(state, card) } as GameAction,
-        ])
-      : playableCard.play(nextState, {} as Card);
+    const playableCard = PLAYABLE_LIBRARY[card.name];
+    if (!card.targetSource && playableCard.target) {
+      return this.playCard({
+        next: (state) => playableCard.target!(state, card),
+      });
+    } else {
+      return this.playCard(new CardPlayAction(card, playableCard));
+    }
+  }
 
-    nextState = response.nextState;
+  target(id: number): ResponseActions {
+    const card = this.state().cards.find((card) => card.id === id);
+    const targetingCard = this.state().cards.find((card) => card.targetSource);
+    if (!card || !targetingCard) {
+      return this.playCard(new SetStateAction(this.state()));
+    }
+    const playableCard = PLAYABLE_LIBRARY[targetingCard.name];
+    return this.playCard(
+      new CardTargetAction(card, targetingCard, playableCard),
+    );
+  }
+
+  private playCard(
+    playable: PlayableCard | GameAction,
+    card?: Card,
+  ): ResponseActions {
+    let response: ResponseActions;
+    if ('play' in playable) {
+      response = playable.play(this.state(), card as Card);
+    } else {
+      response = playable.next(this.state());
+    }
+    let nextState = response.nextState;
     nextState = this.updateCardsStatuses(nextState);
     this.state.set(nextState);
     return {
@@ -91,23 +101,5 @@ export class GameEngine {
       };
     });
     return { ...state, cards: newCards };
-  }
-
-  private combineActions(
-    prev: ResponseActions,
-    next: ResponseActions,
-  ): ResponseActions {
-    const combinedUiActions = [...prev.uiActions, ...next.uiActions];
-
-    const combinedPersistenceActions = [
-      ...prev.persistenceActions,
-      ...next.persistenceActions,
-    ];
-
-    return {
-      nextState: next.nextState,
-      uiActions: combinedUiActions,
-      persistenceActions: combinedPersistenceActions,
-    };
   }
 }

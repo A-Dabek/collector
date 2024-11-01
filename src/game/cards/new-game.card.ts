@@ -12,7 +12,7 @@ export class NewGameCard implements PlayableCard {
     ...GameEngine.initialState,
   };
 
-  play(state: GameState, card: Card): ResponseActions {
+  play(state: GameState): ResponseActions {
     const initialCards: Card[] = [
       findCardInLibrary('hammer-break'),
       findCardInLibrary('card-pickup'),

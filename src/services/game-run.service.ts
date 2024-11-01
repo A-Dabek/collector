@@ -28,4 +28,11 @@ export class GameRunService {
 
     return response.uiActions;
   }
+
+  async target(card: Card) {
+    const response = this.engine.target(card.id);
+    // await this.persistenceService.persist(response.persistenceActions);
+
+    return response.uiActions;
+  }
 }
