@@ -8,7 +8,7 @@ import {
   updateDoc,
   writeBatch,
 } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
+import { firstValueFrom, Observable } from 'rxjs';
 import { Id, Item } from './collection-persistence.service';
 import {
   ItemDeletePersistenceAction,
@@ -76,5 +76,16 @@ export class GameRunPersistenceService {
     console.log('[PERSIST] points', points);
     const gameRun: Partial<GameRun> = { points };
     await updateDoc(this.gameDoc, gameRun);
+  }
+
+  async updateMaxPoints(increment: number) {
+    const maxPoints = (await this.getMaxPoints()) + increment;
+    console.log('[PERSIST] maxPoints', maxPoints);
+    await updateDoc(this.gameDoc, { maxPoints });
+  }
+
+  async getMaxPoints() {
+    const gameRun: GameRun = await firstValueFrom(this.gameState$);
+    return gameRun.maxPoints;
   }
 }

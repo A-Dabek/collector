@@ -31,8 +31,8 @@ export class GameEngine {
 
   readonly state = signal<GameState>(GameEngine.initialState);
 
-  startNewGame(): ResponseActions {
-    const newGame = new NewGameCard();
+  startNewGame(level: number): ResponseActions {
+    const newGame = new NewGameCard(level);
     return this.playCard(newGame);
   }
 

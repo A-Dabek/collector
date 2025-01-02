@@ -204,11 +204,7 @@ import { NavigationComponent } from '../ui/navigation.component';
         </filter>
       </defs>
     </svg>
-
-    <nav>
-      <app-navbar />
-    </nav>
-    <main class="pt-3 px-1">
+    <main class="pt-1 px-1">
       <router-outlet />
     </main>
   `,

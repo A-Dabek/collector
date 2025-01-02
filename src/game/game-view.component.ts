@@ -70,7 +70,7 @@ export class GameViewComponent implements OnInit {
   }
 
   async onRestart() {
-    const uiActions = await this.gameRunService.finish();
+    const uiActions = await this.gameRunService.finish(false);
     this.onNewActions(uiActions);
     await this.startNewGame();
   }

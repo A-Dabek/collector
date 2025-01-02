@@ -9,13 +9,15 @@ export class GameRunService {
   private readonly engine = new GameEngine();
 
   async newGame() {
-    const response = this.engine.startNewGame();
+    const level = await this.persistenceService.getMaxPoints();
+    const response = this.engine.startNewGame(level);
     // await this.persistenceService.persist(response.persistenceActions);
 
     return response.uiActions;
   }
 
-  async finish() {
+  async finish(win: boolean) {
+    await this.persistenceService.updateMaxPoints(win ? 1 : -1);
     const response = this.engine.finishCurrentGame();
     // await this.persistenceService.persist(response.persistenceActions);
 
