@@ -1,15 +1,15 @@
-import { ResponseActions } from '../../actions/game-actions';
+import { Rarity } from '../../../ui/rarity';
+import { CardWasteRandomActionCreator } from '../../actions/card-waste-random-action.creator';
+import { CardName } from '../../library/library';
 import { GameState } from '../../logic/engine';
-import { PlayableCard } from '../card';
-import { CardWasteRandomAction } from '../../actions/card-waste-random.action';
-import { Card } from '../../library/access';
+import { BasePlayableCard } from '../card';
 
-export class SpikesHalfCard implements PlayableCard {
-  play(state: GameState, card: Card): ResponseActions {
-    return new CardWasteRandomAction(2).next(state);
-  }
+export class SpikesHalfCard extends BasePlayableCard {
+  override name: CardName = 'spikes-half';
+  override rarity: Rarity = 'uncommon';
+  override actions = [new CardWasteRandomActionCreator(this.id, 2)];
 
-  enabled(state: GameState): boolean {
+  override enabled(state: GameState): boolean {
     return state.cards.length > 2;
   }
 }

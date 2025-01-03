@@ -1,15 +1,15 @@
-import { ResponseActions } from '../../actions/game-actions';
+import { Rarity } from '../../../ui/rarity';
+import { CardWasteRandomActionCreator } from '../../actions/card-waste-random-action.creator';
+import { CardName } from '../../library/library';
 import { GameState } from '../../logic/engine';
-import { PlayableCard } from '../card';
-import { CardWasteRandomAction } from '../../actions/card-waste-random.action';
-import { Card } from '../../library/access';
+import { BasePlayableCard } from '../card';
 
-export class SpikesInitCard implements PlayableCard {
-  play(state: GameState, card: Card): ResponseActions {
-    return new CardWasteRandomAction(1).next(state);
-  }
+export class SpikesInitCard extends BasePlayableCard {
+  override name: CardName = 'spikes-init';
+  override rarity: Rarity = 'common';
+  override actions = [new CardWasteRandomActionCreator(this.id, 1)];
 
-  enabled(state: GameState): boolean {
+  override enabled(state: GameState): boolean {
     return state.cards.length > 1;
   }
 }

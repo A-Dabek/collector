@@ -1,5 +1,3 @@
-import { Rarity } from '../../ui/rarity';
-
 /*
 rare: cost4
 - increase luck
@@ -30,71 +28,20 @@ mythic: cost6 - only super special
 - chessboard - add chess pieces
 */
 
-export interface CardDefinition {
-  rarity: Rarity;
-  description: string;
-}
-
-export const LIBRARY: Record<string, CardDefinition> = {
+export type CardName =
   // common
-  'card-pickup': {
-    rarity: 'common',
-    description: 'Draw 2',
-  },
-  pill: {
-    rarity: 'common',
-    description: 'Heal 5',
-  },
-  'paper-bag-open': {
-    rarity: 'common',
-    description: 'Expand 1',
-  },
-  'spikes-init': {
-    rarity: 'common',
-    description: 'Destroy random 1',
-  },
-  token: {
-    rarity: 'common',
-    description: 'Earn 1',
-  },
+  | 'card-pickup'
+  | 'pill'
+  | 'paper-bag-open'
+  | 'spikes-init'
+  | 'token'
+  | 'piggy-bank' //FIXME not common
 
-  // uncommon - single effect
-  'paper-bag-crumpled': {
-    rarity: 'uncommon',
-    description: 'Shrink 1',
-  },
-  'hammer-break': {
-    rarity: 'uncommon',
-    description: 'Destroy 1',
-  },
-
-  // uncommon - single common effect x2
-  'card-2-diamonds': {
-    rarity: 'uncommon',
-    description: 'Draw 3',
-  },
-  medicines: {
-    rarity: 'uncommon',
-    description: 'Heal 10',
-  },
-  'shoulder-bag': {
-    rarity: 'uncommon',
-    description: 'Expand 2',
-  },
-  'spikes-half': {
-    rarity: 'uncommon',
-    description: 'Destroy random 2',
-  },
-  'two-coins': {
-    rarity: 'uncommon',
-    description: 'Earn 2',
-  },
-
-  // rare
-
-  // epic
-
-  // legendary
-
-  // mythic
-};
+  // uncommon
+  | 'paper-bag-crumpled'
+  | 'hammer-break'
+  | 'card-2-diamonds'
+  | 'medicines'
+  | 'shoulder-bag'
+  | 'spikes-half'
+  | 'two-coins';

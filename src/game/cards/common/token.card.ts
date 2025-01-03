@@ -1,15 +1,10 @@
-import { ResponseActions } from '../../actions/game-actions';
-import { GameState } from '../../logic/engine';
-import { PlayableCard } from '../card';
+import { Rarity } from '../../../ui/rarity';
 import { AddPointsAction } from '../../actions/add-points.action';
-import { Card } from '../../library/access';
+import { CardName } from '../../library/library';
+import { BasePlayableCard } from '../card';
 
-export class TokenCard implements PlayableCard {
-  play(state: GameState, card: Card): ResponseActions {
-    return new AddPointsAction(1).next(state);
-  }
-
-  enabled(_: GameState): boolean {
-    return true;
-  }
+export class TokenCard extends BasePlayableCard {
+  override name: CardName = 'token';
+  override rarity: Rarity = 'common';
+  override actions = [new AddPointsAction(1)];
 }

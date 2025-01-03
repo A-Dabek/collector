@@ -1,33 +1,30 @@
+import { Rarity } from '../../ui/rarity';
 import { CardAddAction } from '../actions/card-add.action';
-import { ResponseActions } from '../actions/game-actions';
 import { SetHealthAction } from '../actions/set-health.action';
 import { SetSpaceAction } from '../actions/set-space.action';
-import { Card, findCardInLibrary } from '../library/access';
-import { combineActions } from '../logic/dynamic-card';
+import { findCardInLibrary } from '../library/access';
+import { CardName } from '../library/library';
 import { GameEngine, GameState } from '../logic/engine';
-import { PlayableCard } from './card';
+import { BasePlayableCard } from './card';
 
-export class NewGameCard implements PlayableCard {
+export class NewGameCard extends BasePlayableCard {
+  override name: CardName = 'card-2-diamonds';
+  override rarity: Rarity = 'common';
+
   private get initialState(): GameState {
     return { ...GameEngine.initialState, maxPoints: this.level };
   }
 
-  constructor(private readonly level: number) {}
+  constructor(private readonly level: number) {
+    super();
+  }
 
-  play(state: GameState): ResponseActions {
-    const initialCards: Card[] = [
-      // findCardInLibrary('hammer-break'),
-      findCardInLibrary('card-pickup'),
-      findCardInLibrary('card-pickup'),
-    ];
-    return combineActions(this.initialState, [
+  override play(state: GameState) {
+    const initialCards: CardName[] = ['spikes-init', 'piggy-bank'];
+    return [
       new SetHealthAction(this.initialState.maxHealth),
       new SetSpaceAction(this.initialState.space),
       new CardAddAction(initialCards),
-    ]);
-  }
-
-  enabled(_: GameState): boolean {
-    return true;
+    ];
   }
 }

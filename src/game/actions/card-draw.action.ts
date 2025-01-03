@@ -1,26 +1,20 @@
+import { getRandomCardName } from '../library/access';
 import { GameState } from '../logic/engine';
-import { GameAction, ResponseActions } from './game-actions';
-import { GameUiState } from './ui-actions';
-import { Card, getRandomCard } from '../library/access';
 import { CardAddAction } from './card-add.action';
+import { GameAction } from './game-actions';
 
 export class CardDrawAction implements GameAction {
-  private readonly randomCards: Card[];
+  // private readonly randomCards: PlayableCard[];
 
-  constructor(count: number) {
-    this.randomCards = new Array(count).fill(0).map(getRandomCard);
+  constructor(private readonly count: number) {}
+
+  get description(): string {
+    return `Draw (${this.count})`;
   }
 
-  update(state: GameUiState): GameUiState {
-    const cardAdd = new CardAddAction(this.randomCards);
-    return cardAdd.update(state);
-  }
-
-  next(state: GameState): ResponseActions {
-    return {
-      nextState: this.update(state),
-      uiActions: [this],
-      persistenceActions: [],
-    };
+  next(state: GameState) {
+    const randomCards = new Array(this.count).fill(0).map(getRandomCardName);
+    const cardAdd = new CardAddAction(randomCards);
+    return cardAdd.next(state);
   }
 }

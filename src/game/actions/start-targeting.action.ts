@@ -1,29 +1,24 @@
+import { PlayableCard } from '../cards/card';
 import { GameState } from '../logic/engine';
-import { GameAction, ResponseActions } from './game-actions';
-import { GameUiState } from './ui-actions';
-import { Card } from '../library/access';
+import { GameAction } from './game-actions';
 
 export class StartTargetingAction implements GameAction {
-  constructor(private readonly source: Card) {}
+  constructor(private readonly source: PlayableCard) {}
 
-  update(state: GameUiState): GameUiState {
+  get description(): string {
+    return 'Select a target';
+  }
+
+  next(state: GameState) {
     return {
       ...state,
       cards: state.cards.map((card) => {
         return {
           ...card,
           targetSource: card.id === this.source.id,
-          targetCandidate: !card.targetDest && card.id !== this.source.id,
+          // targetCandidate: !card.targetDest && card.id !== this.source.id,
         };
       }),
-    };
-  }
-
-  next(state: GameState): ResponseActions {
-    return {
-      nextState: this.update(state),
-      uiActions: [this],
-      persistenceActions: [],
     };
   }
 }

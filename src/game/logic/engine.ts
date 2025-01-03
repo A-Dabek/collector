@@ -1,14 +1,8 @@
-import { signal } from '@angular/core';
-import { PLAYABLE_LIBRARY } from '../cards/access';
-import { NewGameCard } from '../cards/new-game.card';
-import { Card } from '../library/access';
-import { FinishGameCard } from '../cards/finish-game.card';
+import { GameAction } from '../actions/game-actions';
+import { GameUiState } from '../actions/ui-actions';
 import { PlayableCard } from '../cards/card';
-import { GameAction, ResponseActions } from '../actions/game-actions';
-import { SetEnabledStatusAction } from '../actions/set-enabled-status.action';
-import { SetStateAction } from '../actions/set-state.action';
-import { CardPlayAction } from '../actions/card-play.action';
-import { CardTargetAction } from '../actions/card-target.action';
+import { FinishGameCard } from '../cards/finish-game.card';
+import { NewGameCard } from '../cards/new-game.card';
 
 export interface GameState {
   points: number;
@@ -16,7 +10,7 @@ export interface GameState {
   health: number;
   maxHealth: number;
   space: number;
-  cards: Card[];
+  cards: PlayableCard[];
 }
 
 export class GameEngine {
@@ -29,77 +23,78 @@ export class GameEngine {
     cards: [],
   };
 
-  readonly state = signal<GameState>(GameEngine.initialState);
+  private state = GameEngine.initialState;
 
-  startNewGame(level: number): ResponseActions {
+  startNewGame(level: number): GameUiState[] {
     const newGame = new NewGameCard(level);
     return this.playCard(newGame);
   }
 
-  finishCurrentGame(): ResponseActions {
+  finishCurrentGame(): GameUiState[] {
     const finishGame = new FinishGameCard();
     return this.playCard(finishGame);
   }
 
-  play(id: number): ResponseActions {
-    const card = this.state().cards.find((card) => card.id === id);
+  play(id: number): GameUiState[] {
+    const card = this.state.cards.find((card) => card.id === id);
     if (!card || !card.enabled) {
-      return this.playCard(new SetStateAction(this.state()));
+      throw new Error('Card not found or not enabled');
     }
 
-    const playableCard = PLAYABLE_LIBRARY[card.name];
-    if (!card.targetSource && playableCard.target) {
-      return this.playCard({
-        next: (state) => playableCard.target!(state, card),
-      });
-    } else {
-      return this.playCard(new CardPlayAction(card, playableCard));
-    }
+    // if (!card.targetSource && card.target) {
+    //   return this.playCard({
+    //     next: (state) => card.target!(state, card),
+    //   });
+    // } else {
+    return this.playCard(card);
+    // }
   }
 
-  target(id: number): ResponseActions {
-    const card = this.state().cards.find((card) => card.id === id);
-    const targetingCard = this.state().cards.find((card) => card.targetSource);
-    if (!card || !targetingCard) {
-      return this.playCard(new SetStateAction(this.state()));
-    }
-    const playableCard = PLAYABLE_LIBRARY[targetingCard.name];
-    return this.playCard(
-      new CardTargetAction(card, targetingCard, playableCard),
-    );
+  target(id: number): GameUiState[] {
+    const card = this.state.cards.find((card) => card.id === id);
+    // const targetingCard = this.state.cards.find((card) => card.targetSource);
+    // if (!card || !targetingCard) {
+    //   return this.playCard(new SetStateAction(this.state));
+    // }
+    // const playableCard = PLAYABLE_LIBRARY[targetingCard.name];
+    // return this.playCard(
+    //   new CardTargetAction(card, targetingCard, playableCard),
+    // );
+    throw new Error('Not implemented');
   }
 
-  private playCard(
-    playable: PlayableCard | GameAction,
-    card?: Card,
-  ): ResponseActions {
-    let response: ResponseActions;
-    if ('play' in playable) {
-      response = playable.play(this.state(), card as Card);
-    } else {
-      response = playable.next(this.state());
-    }
-    let nextState = response.nextState;
-    nextState = this.updateCardsStatuses(nextState);
-    this.state.set(nextState);
-    return {
-      ...response,
-      uiActions: [
-        new SetEnabledStatusAction(nextState.cards),
-        ...response.uiActions,
-        new SetStateAction(nextState), // FIXME this overwrite setStatusEnabled actions
-      ],
-    };
-  }
-
-  private updateCardsStatuses(state: GameState) {
-    const newCards = state.cards.map((card) => {
-      const playableCard = PLAYABLE_LIBRARY[card.name];
+  private playCard(playable: PlayableCard): GameUiState[] {
+    const actions = playable.play(this.state);
+    const reactions = this.reactToActions(actions);
+    console.log({ actions });
+    console.log({ reactions });
+    return reactions.map((reaction) => {
+      this.state = reaction.next(this.state);
+      console.log(reaction, this.state);
       return {
-        ...card,
-        enabled: playableCard.enabled(state),
+        ...this.state,
+        cards: this.state.cards.map((card) => card.serialize(this.state)),
       };
     });
-    return { ...state, cards: newCards };
+  }
+
+  private reactToActions(actions: GameAction[]): GameAction[] {
+    const reactions = actions.flatMap((action) => {
+      return this.reactToAction(action);
+    });
+    if (reactions.length > 0) {
+      // react to reactions recursively
+      return [...actions, ...this.reactToActions(reactions)];
+    }
+    return actions;
+  }
+
+  private reactToAction(action: GameAction): GameAction[] {
+    return this.state.cards.flatMap((card) => {
+      if (!card.onAction) {
+        return [];
+      }
+      return card.onAction(this.state, action);
+    });
   }
 }

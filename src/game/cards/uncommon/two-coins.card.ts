@@ -1,16 +1,11 @@
-import { ResponseActions } from '../../actions/game-actions';
-import { GameState } from '../../logic/engine';
-import { PlayableCard } from '../card';
-import { SetPointsAction } from '../../actions/set-points.action';
+import { Rarity } from '../../../ui/rarity';
 import { AddPointsAction } from '../../actions/add-points.action';
-import { Card } from '../../library/access';
+import { CardName } from '../../library/library';
+import { BasePlayableCard } from '../card';
 
-export class TwoCoinsCard implements PlayableCard {
-  play(state: GameState, card: Card): ResponseActions {
-    return new AddPointsAction(2).next(state);
-  }
+export class TwoCoinsCard extends BasePlayableCard {
+  override name: CardName = 'two-coins';
+  override rarity: Rarity = 'uncommon';
 
-  enabled(_: GameState): boolean {
-    return true;
-  }
+  override actions = [new AddPointsAction(2)];
 }

@@ -1,15 +1,15 @@
-import { ResponseActions } from '../../actions/game-actions';
-import { GameState } from '../../logic/engine';
-import { PlayableCard } from '../card';
+import { Rarity } from '../../../ui/rarity';
 import { CardDrawAction } from '../../actions/card-draw.action';
-import { Card } from '../../library/access';
+import { CardName } from '../../library/library';
+import { GameState } from '../../logic/engine';
+import { BasePlayableCard } from '../card';
 
-export class CardPickupCard implements PlayableCard {
-  play(state: GameState, card: Card): ResponseActions {
-    return new CardDrawAction(2).next(state);
-  }
+export class CardPickupCard extends BasePlayableCard {
+  override name: CardName = 'card-pickup';
+  override rarity: Rarity = 'common';
+  override actions = [new CardDrawAction(3)];
 
-  enabled(state: GameState): boolean {
-    return state.space - state.cards.length > 1;
+  override enabled(state: GameState): boolean {
+    return state.space - state.cards.length > 2;
   }
 }

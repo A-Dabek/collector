@@ -5,7 +5,6 @@ import {
   input,
   output,
 } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import {
   bounceInRightOnEnterAnimation,
   collapseOnLeaveAnimation,
@@ -13,8 +12,8 @@ import {
   fadeOutUpOnLeaveAnimation,
   headShakeAnimation,
 } from 'angular-animations';
-import { Card } from '../library/access';
 import { IconComponent } from '../../ui/icon.component';
+import { Card } from '../cards/card';
 import { CardComponent } from './card.component';
 
 @Component({

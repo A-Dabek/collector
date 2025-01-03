@@ -1,10 +1,14 @@
+import { Card } from '../cards/card';
 import { GameState } from '../logic/engine';
-import { GameAction, ResponseActions } from './game-actions';
+import { GameAction } from './game-actions';
 import { GameUiState } from './ui-actions';
-import { Card } from '../library/access';
 
 export class SetEnabledStatusAction implements GameAction {
   constructor(private readonly futureCards: Card[]) {}
+
+  get description(): string {
+    throw new Error('Method not implemented.');
+  }
 
   update(state: GameUiState): GameUiState {
     return {
@@ -18,7 +22,7 @@ export class SetEnabledStatusAction implements GameAction {
     };
   }
 
-  next(state: GameState): ResponseActions {
+  next(state: GameState) {
     return {
       nextState: this.update(state),
       uiActions: [this],

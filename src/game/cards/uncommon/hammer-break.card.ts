@@ -1,21 +1,24 @@
-import { ResponseActions } from '../../actions/game-actions';
-import { GameState } from '../../logic/engine';
-import { PlayableCard } from '../card';
+import { Rarity } from '../../../ui/rarity';
+import { GameAction } from '../../actions/game-actions';
 import { StartTargetingAction } from '../../actions/start-targeting.action';
-import { Card } from '../../library/access';
-import { CardWasteAction } from '../../actions/card-waste.action';
+import { CardName } from '../../library/library';
+import { GameState } from '../../logic/engine';
+import { BasePlayableCard } from '../card';
 
-export class HammerBreakCard implements PlayableCard {
-  play(state: GameState, card: Card): ResponseActions {
-    const targets = state.cards.filter((card) => card.targetCandidate);
-    return new CardWasteAction(targets).next(state);
+export class HammerBreakCard extends BasePlayableCard {
+  override name: CardName = 'hammer-break';
+  override rarity: Rarity = 'uncommon';
+
+  // play(state: GameState, card: Card) {
+  //   const targets = state.cards.filter((card) => card.targetCandidate);
+  //   return new CardWasteAction(targets);
+  // }
+
+  target(state: GameState): GameAction[] {
+    return [new StartTargetingAction(this)];
   }
 
-  target(state: GameState, card: Card): ResponseActions {
-    return new StartTargetingAction(card).next(state);
-  }
-
-  enabled(state: GameState): boolean {
+  override enabled(state: GameState): boolean {
     return state.cards.length > 1;
   }
 }

@@ -21,7 +21,7 @@ export class CardTargetAction implements GameAction {
     return this.targetAction.update(state);
   }
 
-  next(state: GameState): ResponseActions {
+  next(state: GameState) {
     return combineActions(state, [
       {
         next: (state) => ({

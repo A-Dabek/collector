@@ -1,23 +1,22 @@
+import { findCardInLibrary } from '../library/access';
+import { CardName } from '../library/library';
 import { GameState } from '../logic/engine';
-import { GameAction, ResponseActions } from './game-actions';
-import { GameUiState } from './ui-actions';
-import { Card } from '../library/access';
+import { GameAction } from './game-actions';
 
 export class CardAddAction implements GameAction {
-  constructor(private readonly cards: Card[]) {}
+  constructor(private readonly cards: CardName[]) {}
 
-  update(state: GameUiState): GameUiState {
-    return {
-      ...state,
-      cards: [...state.cards, ...this.cards],
-    };
+  get description(): string {
+    return `Draw (${this.cards.join(', ')})`;
   }
 
-  next(state: GameState): ResponseActions {
+  next(state: GameState) {
     return {
-      nextState: this.update(state),
-      uiActions: [this],
-      persistenceActions: [],
+      ...state,
+      cards: [
+        ...state.cards,
+        ...this.cards.map((name) => findCardInLibrary(name)),
+      ],
     };
   }
 }

@@ -1,15 +1,15 @@
-import { ResponseActions } from '../../actions/game-actions';
-import { GameState } from '../../logic/engine';
-import { PlayableCard } from '../card';
+import { Rarity } from '../../../ui/rarity';
 import { AddHealthAction } from '../../actions/add-health.action';
-import { Card } from '../../library/access';
+import { CardName } from '../../library/library';
+import { GameState } from '../../logic/engine';
+import { BasePlayableCard } from '../card';
 
-export class PillCard implements PlayableCard {
-  play(state: GameState, card: Card): ResponseActions {
-    return new AddHealthAction(10).next(state);
-  }
+export class PillCard extends BasePlayableCard {
+  override name: CardName = 'pill';
+  override rarity: Rarity = 'common';
+  override actions = [new AddHealthAction(10)];
 
-  enabled(state: GameState): boolean {
+  override enabled(state: GameState): boolean {
     return state.health < state.maxHealth;
   }
 }

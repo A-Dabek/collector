@@ -1,42 +1,21 @@
 import { rarities, Rarity } from '../../ui/rarity';
-import { LIBRARY } from './library';
+import { PLAYABLE_LIBRARY } from '../cards/access';
+import { PlayableCard } from '../cards/card';
+import { CardName } from './library';
 
-export interface Card {
-  id: number;
-  name: string;
-  rarity: Rarity;
-  cost: number;
-  description: string;
-  enabled: boolean;
-  targetSource: boolean;
-  targetCandidate: boolean;
-  targetDest: boolean;
+export function findCardInLibrary(name: CardName): PlayableCard {
+  return new PLAYABLE_LIBRARY[name]();
 }
 
-export function findCardInLibrary(name: string): Card {
-  const libraryCard = LIBRARY[name];
-  return {
-    id: Math.random(),
-    name,
-    cost: rarities.findIndex((item) => item === libraryCard.rarity) + 1,
-    enabled: true,
-    targetCandidate: false,
-    targetSource: false,
-    targetDest: false,
-    ...libraryCard,
-  };
-}
-
-export function getRandomCard(): Card {
+export function getRandomCardName(): CardName {
   const rarity = rarities[getRarity()];
-  const randomKey = findRandomCardOfRarity(rarity);
-  return findCardInLibrary(randomKey);
+  return findRandomCardOfRarity(rarity);
 }
 
-function findRandomCardOfRarity(rarity: Rarity): string {
-  const cardNames = Object.keys(LIBRARY).filter(
-    (key) => LIBRARY[key].rarity === rarity,
-  );
+function findRandomCardOfRarity(rarity: Rarity): CardName {
+  const cardNames = Object.keys(PLAYABLE_LIBRARY).filter(
+    (key) => new PLAYABLE_LIBRARY[key as CardName]().rarity === rarity,
+  ) as CardName[];
   const randomIndex = Math.floor(Math.random() * cardNames.length);
   return cardNames[randomIndex];
 }

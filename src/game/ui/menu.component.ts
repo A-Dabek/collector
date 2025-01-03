@@ -2,11 +2,9 @@ import {
   ChangeDetectionStrategy,
   Component,
   input,
-  OnInit,
   output,
 } from '@angular/core';
 import { IconComponent } from '../../ui/icon.component';
-import { UiAction } from '../actions/ui-actions';
 
 @Component({
   selector: 'app-game-menu',
@@ -22,15 +20,13 @@ import { UiAction } from '../actions/ui-actions';
       </div>
       <div class="ms-1 text-amber-500">
         {{
-          lastUiAction()
-            ? 'Playing ' + (lastUiAction()?.constructor?.name || '...')
-            : 'Your turn'
+          lastUiAction() ? 'Playing ' + (lastUiAction() || '...') : 'Your turn'
         }}
       </div>
     </div>
   `,
 })
 export class GameMenuComponent {
-  readonly lastUiAction = input<UiAction>();
+  readonly lastUiAction = input<string>();
   readonly restart = output();
 }

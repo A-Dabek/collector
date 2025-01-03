@@ -8,22 +8,10 @@ import {
   output,
   signal,
 } from '@angular/core';
-import {
-  fadeOutUpAnimation,
-  fadeOutUpBigAnimation,
-  headShakeAnimation,
-  heartBeatAnimation,
-  slideInUpAnimation,
-  slideOutUpAnimation,
-  swingAnimation,
-  wobbleAnimation,
-  pulseAnimation,
-  hingeAnimation,
-  zoomOutAnimation,
-} from 'angular-animations';
-import { IconComponent } from '../../ui/icon.component';
-import { Card } from '../library/access';
+import { hingeAnimation, pulseAnimation } from 'angular-animations';
 import { interval } from 'rxjs';
+import { IconComponent } from '../../ui/icon.component';
+import { Card } from '../cards/card';
 
 @Component({
   selector: 'app-card',

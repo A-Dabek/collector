@@ -18,7 +18,7 @@ export class TargetAction implements GameAction {
     };
   }
 
-  next(state: GameState): ResponseActions {
+  next(state: GameState) {
     return {
       nextState: this.update(state),
       uiActions: [this],

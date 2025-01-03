@@ -8,15 +8,12 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { BehaviorSubject, interval, startWith, switchMap } from 'rxjs';
 import { GameRunService } from '../services/game-run.service';
-import { GameUiState, UiAction } from './actions/ui-actions';
-import { Card } from './library/access';
+import { GameUiState } from './actions/ui-actions';
+import { Card } from './cards/card';
 import { GameEngine } from './logic/engine';
-import { SetEnabledStatusAction } from './actions/set-enabled-status.action';
-import { CardPlayAction } from './actions/card-play.action';
-import { GameMenuComponent } from './ui/menu.component';
 import { GameBarsComponent } from './ui/bars.component';
 import { GameBoardComponent } from './ui/board.component';
-import { SetStateAction } from './actions/set-state.action';
+import { GameMenuComponent } from './ui/menu.component';
 
 @Component({
   selector: 'app-game-view',
@@ -24,7 +21,7 @@ import { SetStateAction } from './actions/set-state.action';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [GameMenuComponent, GameBarsComponent, GameBoardComponent],
   template: `
-    <app-game-menu [lastUiAction]="lastUiAction()" (restart)="onRestart()" />
+    <app-game-menu (restart)="onRestart()" />
     <app-game-bars
       [points]="state().points"
       [maxPoints]="state().maxPoints"
@@ -43,10 +40,10 @@ export class GameViewComponent implements OnInit {
 
   readonly state = signal<GameUiState>({
     ...GameEngine.initialState,
+    cards: [],
   });
 
-  readonly uiActions = signal<UiAction[]>([]);
-  readonly lastUiAction = signal<UiAction | undefined>(undefined);
+  readonly snapshots = signal<GameUiState[]>([]);
   private readonly now$ = new BehaviorSubject(0);
 
   constructor() {
@@ -80,51 +77,33 @@ export class GameViewComponent implements OnInit {
     this.onNewActions(uiActions);
   }
 
-  private onNewActions(actions: UiAction[]) {
+  private onNewActions(snapshots: GameUiState[]) {
     this.state.update((state) => ({ ...state }));
-    this.uiActions.update((oldActions) => {
-      const allActions = [...oldActions, ...actions];
-      const enabledActions = allActions.filter(
-        (action) =>
-          action instanceof SetEnabledStatusAction ||
-          action instanceof CardPlayAction,
-      );
-      const finalizeStateAction = allActions.filter(
-        (action) => action instanceof SetStateAction,
-      );
-      const otherActions = allActions.filter(
-        (action) =>
-          !enabledActions.includes(action as any) &&
-          !finalizeStateAction.includes(action as any),
-      );
-      return [
-        ...enabledActions,
-        ...otherActions,
-        ...finalizeStateAction.slice(-1),
-      ];
+    this.snapshots.update((oldSnapshots) => {
+      const allSnapshots = [...oldSnapshots, ...snapshots];
+      // update `enabled` of every card in every snapshot to be the same as the last snapshot
+      const lastSnapshot = allSnapshots[allSnapshots.length - 1].cards;
+      allSnapshots.forEach((snapshot) => {
+        snapshot.cards.forEach((card) => {
+          const lastCard = lastSnapshot.find((c) => c.id === card.id);
+          if (lastCard) {
+            card.enabled = lastCard.enabled;
+          }
+        });
+      });
+      return allSnapshots;
     });
     this.now$.next(0);
   }
 
   private nextAnimation() {
-    const current = this.uiActions()[0];
-    this.lastUiAction.set(current);
+    const current = this.snapshots()[0];
     if (!current) {
-      this.state.update((state) => ({ ...state }));
+      // this.state.update((state) => ({ ...state }));
       return;
     }
-    console.log('[UI]', current);
-    this.uiActions.update(([, ...rest]) => rest);
-    this.state.update((state) => current.update(state));
-
-    // Continue applying actions of type 'setEnabledStatus'
-    while (
-      this.uiActions()[0] instanceof SetEnabledStatusAction ||
-      this.uiActions()[0] instanceof CardPlayAction
-    ) {
-      const nextAction = this.uiActions()[0];
-      this.uiActions.update(([, ...nextRest]) => nextRest);
-      this.state.update((state) => nextAction.update(state));
-    }
+    console.log('[UI] snapshot', current);
+    this.snapshots.update(([, ...rest]) => rest);
+    this.state.set(current);
   }
 }

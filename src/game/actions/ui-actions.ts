@@ -1,7 +1,10 @@
-import { GameState } from '../logic/engine';
+import { Card } from '../cards/card';
 
-export interface GameUiState extends GameState {}
-
-export interface UiAction {
-  update: (state: GameUiState) => GameUiState;
+export interface GameUiState {
+  points: number;
+  maxPoints: number;
+  health: number;
+  maxHealth: number;
+  space: number;
+  cards: Card[];
 }

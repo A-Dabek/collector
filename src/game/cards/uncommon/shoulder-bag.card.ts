@@ -1,16 +1,10 @@
-import { ResponseActions } from '../../actions/game-actions';
-import { GameState } from '../../logic/engine';
-import { PlayableCard } from '../card';
-import { SetSpaceAction } from '../../actions/set-space.action';
+import { Rarity } from '../../../ui/rarity';
 import { AddSpaceAction } from '../../actions/add-space.action';
-import { Card } from '../../library/access';
+import { CardName } from '../../library/library';
+import { BasePlayableCard } from '../card';
 
-export class ShoulderBagCard implements PlayableCard {
-  play(state: GameState, card: Card): ResponseActions {
-    return new AddSpaceAction(2).next(state);
-  }
-
-  enabled(_: GameState): boolean {
-    return true;
-  }
+export class ShoulderBagCard extends BasePlayableCard {
+  override name: CardName = 'shoulder-bag';
+  override rarity: Rarity = 'uncommon';
+  override actions = [new AddSpaceAction(2)];
 }

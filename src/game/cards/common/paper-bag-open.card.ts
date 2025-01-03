@@ -1,15 +1,10 @@
-import { ResponseActions } from '../../actions/game-actions';
-import { GameState } from '../../logic/engine';
-import { PlayableCard } from '../card';
+import { Rarity } from '../../../ui/rarity';
 import { SetSpaceAction } from '../../actions/set-space.action';
-import { Card } from '../../library/access';
+import { CardName } from '../../library/library';
+import { BasePlayableCard } from '../card';
 
-export class PaperBagOpenCard implements PlayableCard {
-  play(state: GameState, card: Card): ResponseActions {
-    return new SetSpaceAction(state.space + 1).next(state);
-  }
-
-  enabled(_: GameState): boolean {
-    return true;
-  }
+export class PaperBagOpenCard extends BasePlayableCard {
+  override name: CardName = 'paper-bag-open';
+  override rarity: Rarity = 'uncommon';
+  override actions = [new SetSpaceAction(1)]; // FIXME new SetSpaceAction(state.space + 1)
 }

@@ -1,15 +1,22 @@
-import { PersistenceAction } from '../../services/persistence-action.factory';
+import { PlayableCard } from '../cards/card';
 import { GameState } from '../logic/engine';
-import { UiAction } from './ui-actions';
-
-export interface ResponseActions {
-  persistenceActions: PersistenceAction[];
-  uiActions: UiAction[];
-  nextState: GameState;
-}
-
-export type InteractiveAction = (state: GameState) => ResponseActions;
 
 export interface GameAction {
-  next(state: GameState): ResponseActions;
+  next(state: GameState): GameState;
+
+  get description(): string;
+}
+
+export interface GameActionCreator {
+  create(state: GameState): GameAction;
+
+  get description(): string;
+}
+
+export interface GameReactionCreator {
+  check(trigger: GameAction, ownerCard: PlayableCard): boolean;
+
+  create(state: GameState): GameAction[];
+
+  get description(): string;
 }

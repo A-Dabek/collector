@@ -1,5 +1,6 @@
 import { inject, Injectable } from '@angular/core';
-import { Card } from '../game/library/access';
+import { GameUiState } from '../game/actions/ui-actions';
+import { Card } from '../game/cards/card';
 import { GameEngine } from '../game/logic/engine';
 import { GameRunPersistenceService } from './game-run-persistence.service';
 
@@ -8,33 +9,21 @@ export class GameRunService {
   private readonly persistenceService = inject(GameRunPersistenceService);
   private readonly engine = new GameEngine();
 
-  async newGame() {
+  async newGame(): Promise<GameUiState[]> {
     const level = await this.persistenceService.getMaxPoints();
-    const response = this.engine.startNewGame(level);
-    // await this.persistenceService.persist(response.persistenceActions);
-
-    return response.uiActions;
+    return this.engine.startNewGame(level);
   }
 
-  async finish(win: boolean) {
+  async finish(win: boolean): Promise<GameUiState[]> {
     await this.persistenceService.updateMaxPoints(win ? 1 : -1);
-    const response = this.engine.finishCurrentGame();
-    // await this.persistenceService.persist(response.persistenceActions);
-
-    return response.uiActions;
+    return this.engine.finishCurrentGame();
   }
 
-  async play(card: Card) {
-    const response = this.engine.play(card.id);
-    // await this.persistenceService.persist(response.persistenceActions);
-
-    return response.uiActions;
+  async play(card: Card): Promise<GameUiState[]> {
+    return this.engine.play(card.id);
   }
 
-  async target(card: Card) {
-    const response = this.engine.target(card.id);
-    // await this.persistenceService.persist(response.persistenceActions);
-
-    return response.uiActions;
+  async target(card: Card): Promise<GameUiState[]> {
+    return this.engine.target(card.id);
   }
 }

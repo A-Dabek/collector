@@ -1,15 +1,12 @@
 import { GameState } from '../logic/engine';
 import { GameAction } from './game-actions';
 
-export class CardWasteAllAction implements GameAction {
+export class UnplayableAction implements GameAction {
   get description(): string {
-    return 'Waste all';
+    return `Unplayable`;
   }
 
   next(state: GameState) {
-    return {
-      ...state,
-      cards: [],
-    };
+    return state;
   }
 }

@@ -1,19 +1,22 @@
 import { GameState } from '../logic/engine';
-import { GameAction, ResponseActions } from './game-actions';
-import { GameUiState } from './ui-actions';
+import { GameAction } from './game-actions';
 
 export class SetStateAction implements GameAction {
   constructor(private readonly state: GameState) {}
 
-  update(_: GameUiState): GameUiState {
+  get description(): string {
+    return 'Set state';
+  }
+
+  update(): GameState {
     return {
       ...this.state,
     };
   }
 
-  next(state: GameState): ResponseActions {
+  next(state: GameState) {
     return {
-      nextState: this.update(state),
+      nextState: this.update(),
       uiActions: [this],
       persistenceActions: [],
     };
