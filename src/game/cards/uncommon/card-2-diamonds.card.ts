@@ -1,7 +1,7 @@
 import { Rarity } from '../../../ui/rarity';
 import { CardDrawAction } from '../../actions/card-draw.action';
-import { CardName } from '../../library/library';
 import { GameState } from '../../logic/engine';
+import { CardName } from '../access';
 import { BasePlayableCard } from '../card';
 
 export class Card2DiamondsCard extends BasePlayableCard {

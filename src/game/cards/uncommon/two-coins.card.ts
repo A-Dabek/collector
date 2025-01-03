@@ -1,6 +1,7 @@
 import { Rarity } from '../../../ui/rarity';
 import { AddPointsAction } from '../../actions/add-points.action';
-import { CardName } from '../../library/library';
+
+import { CardName } from '../access';
 import { BasePlayableCard } from '../card';
 
 export class TwoCoinsCard extends BasePlayableCard {

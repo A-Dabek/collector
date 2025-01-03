@@ -2,7 +2,7 @@ import { Rarity } from '../../ui/rarity';
 import { CostHealthAction } from '../actions/cost-health.action';
 import { EffectWasteAction } from '../actions/effect-waste.action';
 import { GameAction } from '../actions/game-actions';
-import { CardName } from '../library/library';
+import { CardName } from '../cards/access';
 import { GameState } from '../logic/engine';
 import { BaseEffect } from './effect';
 

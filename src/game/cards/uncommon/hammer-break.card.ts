@@ -1,8 +1,8 @@
 import { Rarity } from '../../../ui/rarity';
 import { GameAction } from '../../actions/game-actions';
 import { StartTargetingAction } from '../../actions/start-targeting.action';
-import { CardName } from '../../library/library';
 import { GameState } from '../../logic/engine';
+import { CardName } from '../access';
 import { BasePlayableCard } from '../card';
 
 export class HammerBreakCard extends BasePlayableCard {

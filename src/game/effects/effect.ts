@@ -1,7 +1,7 @@
 import { Rarity } from '../../ui/rarity';
 import { GameAction } from '../actions/game-actions';
+import { CardName } from '../cards/access';
 import { Describable } from '../cards/card';
-import { CardName } from '../library/library';
 import { GameState } from '../logic/engine';
 
 export interface EffectState extends Describable {

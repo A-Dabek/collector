@@ -1,6 +1,7 @@
 import { Rarity } from '../../../ui/rarity';
 import { AddSpaceAction } from '../../actions/add-space.action';
-import { CardName } from '../../library/library';
+
+import { CardName } from '../access';
 import { BasePlayableCard } from '../card';
 
 export class ShoulderBagCard extends BasePlayableCard {

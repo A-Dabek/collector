@@ -1,7 +1,7 @@
 import { Rarity } from '../../../ui/rarity';
 import { CardWasteRandomActionCreator } from '../../actions/card-waste-random-action.creator';
-import { CardName } from '../../library/library';
 import { GameState } from '../../logic/engine';
+import { CardName } from '../access';
 import { BasePlayableCard } from '../card';
 
 export class SpikesInitCard extends BasePlayableCard {

@@ -9,10 +9,11 @@ export class CardPlayAction implements GameAction {
     return `Once`;
   }
 
-  next(state: GameState) {
+  next(state: GameState): GameState {
     return {
       ...state,
       cards: state.cards.filter((card) => card.id !== this.card.id),
+      cardHistory: [...state.cardHistory, this.card.name],
     };
   }
 }

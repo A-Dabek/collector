@@ -6,8 +6,8 @@ import {
   GameActionCreator,
   GameReactionCreator,
 } from '../actions/game-actions';
-import { CardName } from '../library/library';
 import { GameState } from '../logic/engine';
+import { CardName } from './access';
 
 export interface Describable {
   name: string;

@@ -1,6 +1,7 @@
 import { Rarity } from '../../../ui/rarity';
 import { SetSpaceAction } from '../../actions/set-space.action';
-import { CardName } from '../../library/library';
+
+import { CardName } from '../access';
 import { BasePlayableCard } from '../card';
 
 export class PaperBagOpenCard extends BasePlayableCard {

@@ -1,5 +1,6 @@
 import { GameAction } from '../actions/game-actions';
 import { GameUiState } from '../actions/ui-actions';
+import { CardName } from '../cards/access';
 import { GameCard } from '../cards/card';
 import { FinishGameCard } from '../cards/finish-game.card';
 import { NewGameCard } from '../cards/new-game.card';
@@ -13,6 +14,7 @@ export interface GameState {
   space: number;
   cards: GameCard[];
   effects: GameEffect[];
+  cardHistory: CardName[];
 }
 
 export class GameEngine {
@@ -24,6 +26,7 @@ export class GameEngine {
     space: 5,
     cards: [],
     effects: [],
+    cardHistory: [],
   };
 
   private state = GameEngine.initialState;
