@@ -1,9 +1,9 @@
-import { PlayableCard } from '../cards/card';
+import { GameCard } from '../cards/card';
 import { GameState } from '../logic/engine';
 import { GameAction } from './game-actions';
 
 export class StartTargetingAction implements GameAction {
-  constructor(private readonly source: PlayableCard) {}
+  constructor(private readonly source: GameCard) {}
 
   get description(): string {
     return 'Select a target';

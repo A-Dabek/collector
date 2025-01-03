@@ -1,11 +1,11 @@
-import { GameCard } from '../cards/card';
+import { GameEffect } from '../effects/effect';
 import { GameState } from '../logic/engine';
 import { GameAction } from './game-actions';
 
-export class CardWasteAction implements GameAction {
+export class EffectWasteAction implements GameAction {
   readonly ids: number[];
 
-  constructor(cards: GameCard[]) {
+  constructor(cards: GameEffect[]) {
     this.ids = cards.map((card) => card.id);
   }
 
@@ -16,7 +16,7 @@ export class CardWasteAction implements GameAction {
   next(state: GameState) {
     return {
       ...state,
-      cards: state.cards.filter((card) => !this.ids.includes(card.id)),
+      effects: state.effects.filter((card) => !this.ids.includes(card.id)),
     };
   }
 }

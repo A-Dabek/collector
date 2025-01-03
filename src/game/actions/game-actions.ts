@@ -1,4 +1,4 @@
-import { PlayableCard } from '../cards/card';
+import { GameCard } from '../cards/card';
 import { GameState } from '../logic/engine';
 
 export interface GameAction {
@@ -14,7 +14,7 @@ export interface GameActionCreator {
 }
 
 export interface GameReactionCreator {
-  check(trigger: GameAction, ownerCard: PlayableCard): boolean;
+  check(trigger: GameAction, ownerCard: GameCard): boolean;
 
   create(state: GameState): GameAction[];
 

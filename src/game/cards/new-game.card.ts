@@ -20,7 +20,11 @@ export class NewGameCard extends BasePlayableCard {
   }
 
   override play(state: GameState) {
-    const initialCards: CardName[] = ['spikes-init', 'piggy-bank'];
+    const initialCards: CardName[] = [
+      'plain-padlock',
+      'plain-padlock',
+      'token',
+    ];
     return [
       new SetHealthAction(this.initialState.maxHealth),
       new SetSpaceAction(this.initialState.space),

@@ -1,9 +1,9 @@
-import { PlayableCard } from '../cards/card';
+import { GameCard } from '../cards/card';
 import { GameState } from '../logic/engine';
 import { GameAction } from './game-actions';
 
 export class CardPlayAction implements GameAction {
-  constructor(readonly card: PlayableCard) {}
+  constructor(readonly card: GameCard) {}
 
   get description(): string {
     return `Once`;

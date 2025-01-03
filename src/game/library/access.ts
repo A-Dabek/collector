@@ -1,9 +1,9 @@
 import { rarities, Rarity } from '../../ui/rarity';
 import { PLAYABLE_LIBRARY } from '../cards/access';
-import { PlayableCard } from '../cards/card';
+import { GameCard } from '../cards/card';
 import { CardName } from './library';
 
-export function findCardInLibrary(name: CardName): PlayableCard {
+export function findCardInLibrary(name: CardName): GameCard {
   return new PLAYABLE_LIBRARY[name]();
 }
 

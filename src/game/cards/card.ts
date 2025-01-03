@@ -9,18 +9,22 @@ import {
 import { CardName } from '../library/library';
 import { GameState } from '../logic/engine';
 
-export interface Card {
+export interface Describable {
+  name: string;
+  description: string;
+}
+
+export interface CardState extends Describable {
   id: number;
   name: CardName;
   rarity: Rarity;
-  description: string;
   enabled: boolean;
   targetSource: boolean;
   targetCandidate: boolean;
   targetDest: boolean;
 }
 
-export interface PlayableCard {
+export interface GameCard {
   id: number;
   name: CardName;
   rarity: Rarity;
@@ -33,12 +37,14 @@ export interface PlayableCard {
 
   onAction?(state: GameState, action: GameAction): GameAction[];
 
+  onEffect?(state: GameState, actions: GameAction[]): GameAction[];
+
   enabled(state: GameState): boolean;
 
-  serialize(state: GameState): Card;
+  serialize(state: GameState): CardState;
 }
 
-export abstract class BasePlayableCard implements PlayableCard {
+export abstract class BasePlayableCard implements GameCard {
   protected actions: (GameAction | GameActionCreator)[] = [];
   protected reactions: GameReactionCreator[] = [];
 
@@ -76,7 +82,7 @@ export abstract class BasePlayableCard implements PlayableCard {
     return true;
   }
 
-  serialize(state: GameState): Card {
+  serialize(state: GameState): CardState {
     return {
       name: this.name,
       id: this.id,

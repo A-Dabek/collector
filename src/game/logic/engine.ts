@@ -1,8 +1,9 @@
 import { GameAction } from '../actions/game-actions';
 import { GameUiState } from '../actions/ui-actions';
-import { PlayableCard } from '../cards/card';
+import { GameCard } from '../cards/card';
 import { FinishGameCard } from '../cards/finish-game.card';
 import { NewGameCard } from '../cards/new-game.card';
+import { GameEffect } from '../effects/effect';
 
 export interface GameState {
   points: number;
@@ -10,7 +11,8 @@ export interface GameState {
   health: number;
   maxHealth: number;
   space: number;
-  cards: PlayableCard[];
+  cards: GameCard[];
+  effects: GameEffect[];
 }
 
 export class GameEngine {
@@ -21,6 +23,7 @@ export class GameEngine {
     maxHealth: 10,
     space: 5,
     cards: [],
+    effects: [],
   };
 
   private state = GameEngine.initialState;
@@ -63,9 +66,11 @@ export class GameEngine {
     throw new Error('Not implemented');
   }
 
-  private playCard(playable: PlayableCard): GameUiState[] {
+  private playCard(playable: GameCard): GameUiState[] {
     const actions = playable.play(this.state);
-    const reactions = this.reactToActions(actions);
+    const postEffectActions = this.applyEffects(actions);
+    const reactions = this.reactToActions(postEffectActions);
+    console.log({ postEffectActions });
     console.log({ actions });
     console.log({ reactions });
     return reactions.map((reaction) => {
@@ -74,8 +79,18 @@ export class GameEngine {
       return {
         ...this.state,
         cards: this.state.cards.map((card) => card.serialize(this.state)),
+        effects: this.state.effects.map((effect) =>
+          effect.serialize(this.state),
+        ),
       };
     });
+  }
+
+  private applyEffects(actions: GameAction[]) {
+    return this.state.effects.reduce(
+      (finalActions, effect) => effect.apply(this.state, finalActions),
+      actions,
+    );
   }
 
   private reactToActions(actions: GameAction[]): GameAction[] {

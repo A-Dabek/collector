@@ -1,3 +1,4 @@
+import { NgIf } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -9,30 +10,54 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { BehaviorSubject, interval, startWith, switchMap } from 'rxjs';
 import { GameRunService } from '../services/game-run.service';
 import { GameUiState } from './actions/ui-actions';
-import { Card } from './cards/card';
+import { CardState, Describable } from './cards/card';
 import { GameEngine } from './logic/engine';
 import { GameBarsComponent } from './ui/bars.component';
 import { GameBoardComponent } from './ui/board.component';
+import { GameDescriptionComponent } from './ui/description.component';
+import { GameEffectsComponent } from './ui/effects.component';
 import { GameMenuComponent } from './ui/menu.component';
 
 @Component({
   selector: 'app-game-view',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [GameMenuComponent, GameBarsComponent, GameBoardComponent],
+  imports: [
+    GameMenuComponent,
+    GameBarsComponent,
+    GameBoardComponent,
+    GameDescriptionComponent,
+    NgIf,
+    GameEffectsComponent,
+  ],
   template: `
-    <app-game-menu (restart)="onRestart()" />
-    <app-game-bars
-      [points]="state().points"
-      [maxPoints]="state().maxPoints"
-      [health]="state().health"
-      [maxHealth]="state().maxHealth"
-    />
-    <app-game-board
-      [space]="state().space"
-      [cards]="state().cards"
-      (play)="onPlay($event)"
-    />
+    <div class="flex flex-col h-svh pt-2">
+      <app-game-menu (restart)="onRestart()" />
+      <app-game-bars
+        class="block mt-1.5 mb-1.5"
+        [points]="state().points"
+        [maxPoints]="state().maxPoints"
+        [health]="state().health"
+        [maxHealth]="state().maxHealth"
+      />
+      <app-game-effects
+        class="block mb-1.5"
+        [effects]="state().effects"
+        (highlight)="onHighlight($event)"
+      />
+      <app-game-board
+        [space]="state().space"
+        [cards]="state().cards"
+        (play)="onPlay($event)"
+        (highlight)="onHighlight($event)"
+      />
+      <app-game-description
+        class="block mt-auto mb-auto"
+        *ngIf="activeItem() as card"
+        [name]="card.name"
+        [description]="card.description"
+      />
+    </div>
   `,
 })
 export class GameViewComponent implements OnInit {
@@ -41,9 +66,11 @@ export class GameViewComponent implements OnInit {
   readonly state = signal<GameUiState>({
     ...GameEngine.initialState,
     cards: [],
+    effects: [],
   });
 
   readonly snapshots = signal<GameUiState[]>([]);
+  readonly activeItem = signal<Describable | undefined>(undefined);
   private readonly now$ = new BehaviorSubject(0);
 
   constructor() {
@@ -72,9 +99,14 @@ export class GameViewComponent implements OnInit {
     await this.startNewGame();
   }
 
-  async onPlay(card: Card) {
+  async onPlay(card: CardState) {
+    this.activeItem.set(undefined);
     const uiActions = await this.gameRunService.play(card);
     this.onNewActions(uiActions);
+  }
+
+  async onHighlight(describable: Describable) {
+    this.activeItem.set(describable);
   }
 
   private onNewActions(snapshots: GameUiState[]) {
@@ -106,4 +138,6 @@ export class GameViewComponent implements OnInit {
     this.snapshots.update(([, ...rest]) => rest);
     this.state.set(current);
   }
+
+  protected readonly history = history;
 }

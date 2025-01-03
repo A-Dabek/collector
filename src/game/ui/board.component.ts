@@ -13,7 +13,7 @@ import {
   headShakeAnimation,
 } from 'angular-animations';
 import { IconComponent } from '../../ui/icon.component';
-import { Card } from '../cards/card';
+import { CardState } from '../cards/card';
 import { CardComponent } from './card.component';
 
 @Component({
@@ -37,21 +37,16 @@ import { CardComponent } from './card.component';
   template: `
     <div class="grid grid-cols-5 absolute opacity-20">
       @for (space of spaceArray(); let i = $index; track i) {
-        <app-icon
-          class="px-1 py-5"
-          name="stack"
-          [size]="5"
-          [@expand]
-          [@shrink]
-        />
+        <app-icon class="px-1" name="stack" [size]="5" [@expand] [@shrink] />
       }
     </div>
     <div class="grid grid-cols-5 relative">
-      @for (item of cards(); track item.id; let index = $index) {
+      @for (item of cards(); track item.id) {
         <app-card
           class="px-1"
           [card]="item"
           (usage)="play.emit(item)"
+          (highlight)="highlight.emit(item)"
           [@enter]
           [@leave]
         />
@@ -61,8 +56,9 @@ import { CardComponent } from './card.component';
 })
 export class GameBoardComponent {
   readonly space = input.required<number>();
-  readonly cards = input.required<Card[]>();
-  readonly play = output<Card>();
+  readonly cards = input.required<CardState[]>();
+  readonly play = output<CardState>();
+  readonly highlight = output<CardState>();
 
   readonly spaceArray = computed(() => Array(this.space()).fill(0));
 }

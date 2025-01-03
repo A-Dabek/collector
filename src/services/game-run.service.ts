@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { GameUiState } from '../game/actions/ui-actions';
-import { Card } from '../game/cards/card';
+import { CardState } from '../game/cards/card';
 import { GameEngine } from '../game/logic/engine';
 import { GameRunPersistenceService } from './game-run-persistence.service';
 
@@ -19,11 +19,11 @@ export class GameRunService {
     return this.engine.finishCurrentGame();
   }
 
-  async play(card: Card): Promise<GameUiState[]> {
+  async play(card: CardState): Promise<GameUiState[]> {
     return this.engine.play(card.id);
   }
 
-  async target(card: Card): Promise<GameUiState[]> {
+  async target(card: CardState): Promise<GameUiState[]> {
     return this.engine.target(card.id);
   }
 }

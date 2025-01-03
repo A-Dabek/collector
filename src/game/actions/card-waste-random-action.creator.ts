@@ -1,4 +1,4 @@
-import { PlayableCard } from '../cards/card';
+import { GameCard } from '../cards/card';
 import { GameState } from '../logic/engine';
 import { CardWasteAction } from './card-waste.action';
 import { GameAction, GameActionCreator } from './game-actions';
@@ -20,7 +20,7 @@ export class CardWasteRandomActionCreator implements GameActionCreator {
     return `Waste random (${this.count})`;
   }
 
-  private findIds(cards: PlayableCard[]) {
+  private findIds(cards: GameCard[]) {
     function randomShuffleCards() {
       const shuffledCards = cards.slice();
       for (let i = shuffledCards.length - 1; i > 0; i--) {

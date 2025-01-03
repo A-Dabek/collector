@@ -1,4 +1,4 @@
-import { PlayableCard } from '../../cards/card';
+import { GameCard } from '../../cards/card';
 import { GameState } from '../../logic/engine';
 import { CardWasteAction } from '../card-waste.action';
 import { GameAction, GameReactionCreator } from '../game-actions';
@@ -6,7 +6,7 @@ import { GameAction, GameReactionCreator } from '../game-actions';
 export class OnWasteReaction implements GameReactionCreator {
   constructor(private readonly actions: GameAction[]) {}
 
-  check(trigger: GameAction, ownerCard: PlayableCard): boolean {
+  check(trigger: GameAction, ownerCard: GameCard): boolean {
     return (
       trigger instanceof CardWasteAction && trigger.ids.includes(ownerCard.id)
     );

@@ -1,4 +1,5 @@
-import { Card } from '../cards/card';
+import { CardState } from '../cards/card';
+import { EffectState } from '../effects/effect';
 
 export interface GameUiState {
   points: number;
@@ -6,5 +7,6 @@ export interface GameUiState {
   health: number;
   maxHealth: number;
   space: number;
-  cards: Card[];
+  cards: CardState[];
+  effects: EffectState[];
 }

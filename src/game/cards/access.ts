@@ -1,11 +1,12 @@
 import { CardName } from '../library/library';
-import { PlayableCard } from './card';
+import { GameCard } from './card';
 import { CardPickupCard } from './common/card-pickup.card';
 import { PaperBagOpenCard } from './common/paper-bag-open.card';
-import { PiggyBankCard } from './common/piggy-bank.card';
 import { PillCard } from './common/pill.card';
 import { SpikesInitCard } from './common/spikes-init.card';
 import { TokenCard } from './common/token.card';
+import { PiggyBankCard } from './piggy-bank.card';
+import { PlainPadlockCard } from './plain-padlock.card';
 import { Card2DiamondsCard } from './uncommon/card-2-diamonds.card';
 import { HammerBreakCard } from './uncommon/hammer-break.card';
 import { MedicinesCard } from './uncommon/medicines.card';
@@ -14,7 +15,7 @@ import { ShoulderBagCard } from './uncommon/shoulder-bag.card';
 import { SpikesHalfCard } from './uncommon/spikes-half.card';
 import { TwoCoinsCard } from './uncommon/two-coins.card';
 
-export const PLAYABLE_LIBRARY: Record<CardName, new () => PlayableCard> = {
+export const PLAYABLE_LIBRARY: Record<CardName, new () => GameCard> = {
   //common
   'card-pickup': CardPickupCard,
   pill: PillCard,
@@ -22,6 +23,7 @@ export const PLAYABLE_LIBRARY: Record<CardName, new () => PlayableCard> = {
   'spikes-init': SpikesInitCard,
   token: TokenCard,
   'piggy-bank': PiggyBankCard,
+  'plain-padlock': PlainPadlockCard,
 
   //uncommon
   'paper-bag-crumpled': PaperBagCrumpledCard,

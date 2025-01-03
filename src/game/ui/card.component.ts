@@ -11,7 +11,7 @@ import {
 import { hingeAnimation, pulseAnimation } from 'angular-animations';
 import { interval } from 'rxjs';
 import { IconComponent } from '../../ui/icon.component';
-import { Card } from '../cards/card';
+import { CardState } from '../cards/card';
 
 @Component({
   selector: 'app-card',
@@ -28,7 +28,6 @@ import { Card } from '../cards/card';
   ],
   template: `
     <div *ngIf="card() as card" class="text-center">
-      <div>{{ card.name }}</div>
       <app-icon
         class="cursor-pointer"
         [@target]="{
@@ -42,10 +41,9 @@ import { Card } from '../cards/card';
         [name]="card.name"
         [color]="card.enabled ? '' : '#707070'"
         [rarity]="card.rarity"
-        [size]="5"
+        [size]="size()"
         (click)="onUsage()"
       />
-      <div class="text-xs">{{ card.description }}</div>
     </div>
   `,
 })
@@ -56,8 +54,10 @@ export class CardComponent {
   static timerS = signal(false);
 
   @HostBinding() class = 'block';
-  readonly card = input<Card>();
+  readonly size = input<number>(5);
+  readonly card = input<CardState>();
   readonly usage = output();
+  readonly highlight = output();
   animate = false;
   readonly animateEnabled = computed(() => CardComponent.timerS());
 

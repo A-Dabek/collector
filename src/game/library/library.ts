@@ -1,8 +1,9 @@
 /*
-rare: cost4
+(feasible)
 - increase luck
-
-legendary: cost5 - only special
+- die - get a card of same rarity or not
+- note with a sword - complete a task for points
+- add 5 spaces with cards of every rarity
 - play 5 random cards for free
 - destroy a card and get a higher rarity card
 - draw rare-less cards until space is full
@@ -11,20 +12,23 @@ legendary: cost5 - only special
 - add missing health as max HP
 - re-roll all cards
 - shrink spaces with each distinct rarity
-- add 5 spaces with cards of every rarity
 
-mythic: cost6 - only super special
-- plain-padlock - lock health for next card
-- goldfish/djinn - wishes
-- fisherman - random fish?
+(needs play history)
 - exhume a card
-- note with a sword - complete a task for points
+- parrot - same effect as previous
+
+(needs targeting)
+- ouroboros - play a card infinitely as long as it's possible (needs targetting)
+
+(needs options)
+- shop - buy a card for points
+- goldfish/djinn - wishes
+
+(unknown)
+- fisherman - random fish?
 - incognito - get a card without info
 - time limit - lose hp? every second
 - tick - drains life?
-- ouroboros - play a card infitenly
-- shop - buy a card for points
-- parrot - same effect as previous
 - chessboard - add chess pieces
 */
 
@@ -35,6 +39,7 @@ export type CardName =
   | 'paper-bag-open'
   | 'spikes-init'
   | 'token'
+  | 'plain-padlock'
   | 'piggy-bank' //FIXME not common
 
   // uncommon
