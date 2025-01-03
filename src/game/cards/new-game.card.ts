@@ -1,8 +1,7 @@
 import { Rarity } from '../../ui/rarity';
-import { CardAddAction } from '../actions/card-add.action';
-import { SetHealthAction } from '../actions/set-health.action';
-import { SetSpaceAction } from '../actions/set-space.action';
-import { findCardInLibrary } from '../library/access';
+import { SetHealthAction } from '../actions/basic/set-health.action';
+import { CardAddAction } from '../actions/basic/card-add.action';
+import { SetSpaceAction } from '../actions/basic/set-space.action';
 import { GameEngine, GameState } from '../logic/engine';
 import { CardName } from './access';
 import { BasePlayableCard } from './card';
@@ -20,7 +19,12 @@ export class NewGameCard extends BasePlayableCard {
   }
 
   override play(state: GameState) {
-    const initialCards: CardName[] = ['token', 'token', 'raise-zombie'];
+    const initialCards: CardName[] = [
+      'token',
+      'token',
+      'raise-zombie',
+      'parrot-head',
+    ];
     return [
       new SetHealthAction(this.initialState.maxHealth),
       new SetSpaceAction(this.initialState.space),

@@ -1,7 +1,7 @@
-import { CardWasteAllAction } from '../actions/card-waste-all.action';
-import { SetHealthAction } from '../actions/set-health.action';
-import { SetPointsAction } from '../actions/set-points.action';
-import { SetSpaceAction } from '../actions/set-space.action';
+import { CardWasteAllAction } from '../actions/basic/card-waste-all.action';
+import { SetHealthAction } from '../actions/basic/set-health.action';
+import { SetPointsAction } from '../actions/basic/set-points.action';
+import { SetSpaceAction } from '../actions/basic/set-space.action';
 import { GameState } from '../logic/engine';
 import { CardName } from './access';
 import { BasePlayableCard } from './card';

@@ -1,6 +1,6 @@
-import { GameCard } from '../cards/card';
-import { GameState } from '../logic/engine';
-import { GameAction } from './game-actions';
+import { GameCard } from '../../cards/card';
+import { GameState } from '../../logic/engine';
+import { GameAction } from '../game-actions';
 
 export class CardWasteAction implements GameAction {
   readonly ids: number[];

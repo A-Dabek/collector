@@ -4,6 +4,7 @@ import { PaperBagOpenCard } from './common/paper-bag-open.card';
 import { PillCard } from './common/pill.card';
 import { SpikesInitCard } from './common/spikes-init.card';
 import { TokenCard } from './common/token.card';
+import { ParrotHeadCard } from './parrot-head.card';
 import { PiggyBankCard } from './piggy-bank.card';
 import { PlainPadlockCard } from './plain-padlock.card';
 import { Card2DiamondsCard } from './uncommon/card-2-diamonds.card';
@@ -29,10 +30,6 @@ import { RaiseZombieCard } from './raise-zombie.card';
 - add missing health as max HP
 - re-roll all cards
 - shrink spaces with each distinct rarity
-
-(needs play history)
-- exhume a card
-- parrot - same effect as previous
 
 (needs targeting)
 - ouroboros - play a card infinitely as long as it's possible (needs targetting)
@@ -67,7 +64,8 @@ export type CardName =
   | 'shoulder-bag'
   | 'spikes-half'
   | 'two-coins'
-  | 'raise-zombie';
+  | 'raise-zombie'
+  | 'parrot-head';
 
 export const PLAYABLE_LIBRARY: Record<CardName, new () => GameCard> = {
   //common
@@ -88,4 +86,5 @@ export const PLAYABLE_LIBRARY: Record<CardName, new () => GameCard> = {
   'two-coins': TwoCoinsCard,
   'hammer-break': HammerBreakCard,
   'raise-zombie': RaiseZombieCard,
+  'parrot-head': ParrotHeadCard,
 };

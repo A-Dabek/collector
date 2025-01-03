@@ -1,6 +1,6 @@
 import { GameCard } from '../../cards/card';
 import { GameState } from '../../logic/engine';
-import { CardWasteAction } from '../card-waste.action';
+import { CardWasteAction } from '../basic/card-waste.action';
 import { GameAction, GameReactionCreator } from '../game-actions';
 
 export class OnWasteReaction implements GameReactionCreator {

@@ -8,7 +8,7 @@ export interface GameAction {
 }
 
 export interface GameActionCreator {
-  create(state: GameState): GameAction;
+  create(state: GameState): GameAction[];
 
   get description(): string;
 }

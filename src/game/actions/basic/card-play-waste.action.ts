@@ -1,8 +1,8 @@
-import { GameCard } from '../cards/card';
-import { GameState } from '../logic/engine';
-import { GameAction } from './game-actions';
+import { GameCard } from '../../cards/card';
+import { GameState } from '../../logic/engine';
+import { GameAction } from '../game-actions';
 
-export class CardPlayAction implements GameAction {
+export class CardPlayWasteAction implements GameAction {
   constructor(readonly card: GameCard) {}
 
   get description(): string {

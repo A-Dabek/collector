@@ -1,6 +1,6 @@
 import { GameState } from '../logic/engine';
 import { GameAction } from './game-actions';
-import { SetSpaceAction } from './set-space.action';
+import { SetSpaceAction } from './basic/set-space.action';
 
 export class AddSpaceAction implements GameAction {
   constructor(private readonly increment: number) {}

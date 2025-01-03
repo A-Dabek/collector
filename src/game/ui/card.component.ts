@@ -11,6 +11,7 @@ import {
 import { hingeAnimation, pulseAnimation } from 'angular-animations';
 import { interval } from 'rxjs';
 import { IconComponent } from '../../ui/icon.component';
+import { rarityDisabledColors } from '../../ui/rarity';
 import { CardState } from '../cards/card';
 
 @Component({
@@ -39,7 +40,7 @@ import { CardState } from '../cards/card';
           params: {},
         }"
         [name]="card.name"
-        [color]="card.enabled ? '' : '#707070'"
+        [color]="card.enabled ? '' : rarityDisabledColors[card.rarity]"
         [rarity]="card.rarity"
         [size]="size()"
         (click)="onUsage()"
@@ -52,6 +53,8 @@ export class CardComponent {
     CardComponent.timerS.set(a % 2 == 0),
   );
   static timerS = signal(false);
+
+  readonly rarityDisabledColors = rarityDisabledColors;
 
   @HostBinding() class = 'block';
   readonly size = input<number>(5);

@@ -1,6 +1,6 @@
 import { Rarity } from '../../ui/rarity';
 import { CostHealthAction } from '../actions/cost-health.action';
-import { EffectWasteAction } from '../actions/effect-waste.action';
+import { EffectWasteAction } from '../actions/basic/effect-waste.action';
 import { GameAction } from '../actions/game-actions';
 import { CardName } from '../cards/access';
 import { GameState } from '../logic/engine';

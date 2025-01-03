@@ -1,5 +1,5 @@
-import { GameState } from '../logic/engine';
-import { GameAction } from './game-actions';
+import { GameState } from '../../logic/engine';
+import { GameAction } from '../game-actions';
 
 export class SetSpaceAction implements GameAction {
   constructor(private readonly value: number) {}

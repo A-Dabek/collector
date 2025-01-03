@@ -1,7 +1,7 @@
 import { Rarity } from '../../ui/rarity';
-import { CardAddAction } from '../actions/card-add.action';
+import { CardAddAction } from '../actions/basic/card-add.action';
 import { OnWasteReaction } from '../actions/reactions/on-waste-reaction';
-import { UnplayableAction } from '../actions/unplayable.action';
+import { UnplayableAction } from '../actions/basic/unplayable.action';
 import { GameState } from '../logic/engine';
 import { CardName } from './access';
 import { BasePlayableCard } from './card';

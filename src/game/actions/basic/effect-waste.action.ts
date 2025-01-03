@@ -1,6 +1,6 @@
-import { GameEffect } from '../effects/effect';
-import { GameState } from '../logic/engine';
-import { GameAction } from './game-actions';
+import { GameEffect } from '../../effects/effect';
+import { GameState } from '../../logic/engine';
+import { GameAction } from '../game-actions';
 
 export class EffectWasteAction implements GameAction {
   readonly ids: number[];

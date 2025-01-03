@@ -1,7 +1,7 @@
-import { GameCard } from '../cards/card';
-import { GameState } from '../logic/engine';
-import { CardWasteAction } from './card-waste.action';
-import { GameAction, GameActionCreator } from './game-actions';
+import { GameCard } from '../../cards/card';
+import { GameState } from '../../logic/engine';
+import { CardWasteAction } from '../basic/card-waste.action';
+import { GameAction, GameActionCreator } from '../game-actions';
 
 export class CardWasteRandomActionCreator implements GameActionCreator {
   constructor(
@@ -9,11 +9,11 @@ export class CardWasteRandomActionCreator implements GameActionCreator {
     private readonly count: number,
   ) {}
 
-  create(state: GameState): GameAction {
+  create(state: GameState): GameAction[] {
     const cardsOtherThanOwner = state.cards.filter(
       (card) => card.id !== this.ownerId,
     );
-    return new CardWasteAction(this.findIds(cardsOtherThanOwner));
+    return [new CardWasteAction(this.findIds(cardsOtherThanOwner))];
   }
 
   get description(): string {

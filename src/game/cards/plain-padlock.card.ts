@@ -1,5 +1,5 @@
 import { Rarity } from '../../ui/rarity';
-import { EffectAddAction } from '../actions/effect-add.action';
+import { EffectAddAction } from '../actions/basic/effect-add.action';
 import { PlainPadlockEffect } from '../effects/plain-padlock.effect';
 
 import { CardName } from './access';

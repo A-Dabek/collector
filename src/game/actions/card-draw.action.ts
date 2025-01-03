@@ -1,6 +1,6 @@
 import { getRandomCardName } from '../library/access';
 import { GameState } from '../logic/engine';
-import { CardAddAction } from './card-add.action';
+import { CardAddAction } from './basic/card-add.action';
 import { GameAction } from './game-actions';
 
 export class CardDrawAction implements GameAction {

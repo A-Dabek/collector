@@ -1,6 +1,6 @@
 import { GameState } from '../logic/engine';
 import { GameAction } from './game-actions';
-import { SetHealthAction } from './set-health.action';
+import { SetHealthAction } from './basic/set-health.action';
 
 export class AddHealthAction implements GameAction {
   constructor(private readonly increment: number) {}

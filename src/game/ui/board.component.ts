@@ -35,12 +35,12 @@ import { CardComponent } from './card.component';
     collapseOnLeaveAnimation({ anchor: 'shrink', duration: 500 }),
   ],
   template: `
-    <div class="grid grid-cols-5 absolute opacity-20">
+    <div class="grid grid-cols-5 gap-5 absolute opacity-20">
       @for (space of spaceArray(); let i = $index; track i) {
         <app-icon class="px-1" name="stack" [size]="5" [@expand] [@shrink] />
       }
     </div>
-    <div class="grid grid-cols-5 relative">
+    <div class="grid grid-cols-5 gap-5 relative">
       @for (item of cards(); track item.id) {
         <app-card
           class="px-1"

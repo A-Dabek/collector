@@ -15,4 +15,13 @@ export const rarityColors: Record<Rarity, string> = {
   mythic: '#DC143C', // Crimson Mythic Red
 };
 
+export const rarityDisabledColors: Record<Rarity, string> = {
+  common: '#A9A9A9', // DarkGray
+  uncommon: '#006400', // DarkGreen
+  rare: '#00008B', // DarkBlue
+  epic: '#4B0082', // Indigo
+  legendary: '#FFD700', // Gold
+  mythic: '#8B0000', // DarkRed
+};
+
 export const rarities = Object.keys(rarityColors) as Rarity[];

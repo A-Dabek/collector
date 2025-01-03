@@ -1,5 +1,5 @@
 import { Rarity } from '../../../ui/rarity';
-import { SetSpaceAction } from '../../actions/set-space.action';
+import { SetSpaceAction } from '../../actions/basic/set-space.action';
 
 import { CardName } from '../access';
 import { BasePlayableCard } from '../card';

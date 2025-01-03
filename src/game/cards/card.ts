@@ -1,5 +1,5 @@
 import { Rarity } from '../../ui/rarity';
-import { CardPlayAction } from '../actions/card-play.action';
+import { CardPlayWasteAction } from '../actions/basic/card-play-waste.action';
 import { CostHealthAction } from '../actions/cost-health.action';
 import {
   GameAction,
@@ -59,11 +59,11 @@ export abstract class BasePlayableCard implements GameCard {
   }
 
   protected costActions(): GameAction[] {
-    return [new CostHealthAction(this.rarity), new CardPlayAction(this)];
+    return [new CostHealthAction(this.rarity), new CardPlayWasteAction(this)];
   }
 
   play(state: GameState): GameAction[] {
-    return [...this.costActions(), ...this.actions].map((action) =>
+    return [...this.costActions(), ...this.actions].flatMap((action) =>
       'create' in action ? action.create(state) : action,
     );
   }

@@ -1,5 +1,5 @@
 import { Rarity } from '../../../ui/rarity';
-import { CardWasteRandomActionCreator } from '../../actions/card-waste-random-action.creator';
+import { CardWasteRandomActionCreator } from '../../actions/creators/card-waste-random-action.creator';
 import { GameState } from '../../logic/engine';
 import { CardName } from '../access';
 import { BasePlayableCard } from '../card';
