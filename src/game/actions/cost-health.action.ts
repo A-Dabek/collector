@@ -4,18 +4,28 @@ import { AddHealthAction } from './add-health.action';
 import { GameAction } from './game-actions';
 
 export class CostHealthAction implements GameAction {
-  constructor(private readonly rarity: Rarity) {}
+  private readonly addHealthAction: AddHealthAction;
+  private readonly amount: number;
+
+  constructor(rarity: Rarity) {
+    this.amount = this.rarityToNumber(rarity);
+    this.addHealthAction = new AddHealthAction(-this.amount);
+  }
 
   get description(): string {
-    return `Drain (${this.rarityToNumber(this.rarity)})`;
+    return `Drain (${this.amount})`;
+  }
+
+  isApplicable(state: GameState): boolean {
+    return this.addHealthAction.isApplicable(state);
+  }
+
+  next(state: GameState) {
+    return this.addHealthAction.next(state);
   }
 
   private rarityToNumber(rarity: Rarity): number {
     const index = rarities.findIndex((r) => r === rarity);
     return index + 1; // Adding 1 to transform 0-based index to 1-based number
-  }
-
-  next(state: GameState) {
-    return new AddHealthAction(-this.rarityToNumber(this.rarity)).next(state);
   }
 }

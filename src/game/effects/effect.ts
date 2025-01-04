@@ -1,7 +1,7 @@
 import { Rarity } from '../../ui/rarity';
 import { GameAction } from '../actions/game-actions';
 import { CardName } from '../cards/access';
-import { Describable } from '../cards/card';
+import { Describable, GameCard } from '../cards/card';
 import { GameState } from '../logic/engine';
 
 export interface EffectState extends Describable {
@@ -17,7 +17,11 @@ export interface GameEffect {
 
   get description(): string;
 
-  apply(state: GameState, actions: GameAction[]): GameAction[];
+  apply(
+    state: GameState,
+    actions: GameAction[],
+    cardPlayed: GameCard,
+  ): GameAction[];
 
   serialize(state: GameState): EffectState;
 }
@@ -30,7 +34,11 @@ export abstract class BaseEffect implements GameEffect {
 
   abstract get description(): string;
 
-  abstract apply(state: GameState, actions: GameAction[]): GameAction[];
+  abstract apply(
+    state: GameState,
+    actions: GameAction[],
+    cardPlayed: GameCard,
+  ): GameAction[];
 
   serialize(state: GameState): EffectState {
     return {

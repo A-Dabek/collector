@@ -13,10 +13,6 @@ export class PiggyBankCard extends BasePlayableCard {
     new OnWasteReaction([new CardAddAction(new Array(3).fill('token'))]),
   ];
 
-  override enabled(state: GameState): boolean {
-    return false;
-  }
-
   override costActions() {
     return [new UnplayableAction()];
   }

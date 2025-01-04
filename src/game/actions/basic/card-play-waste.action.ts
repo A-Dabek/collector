@@ -9,6 +9,10 @@ export class CardPlayWasteAction implements GameAction {
     return `Once`;
   }
 
+  isApplicable(state: GameState): boolean {
+    return true;
+  }
+
   next(state: GameState): GameState {
     return {
       ...state,

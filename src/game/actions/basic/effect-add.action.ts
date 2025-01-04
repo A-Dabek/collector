@@ -9,6 +9,10 @@ export class EffectAddAction implements GameAction {
     return `Apply (${this.effects.map((e) => e.name).join(', ')})`;
   }
 
+  isApplicable(state: GameState): boolean {
+    return true;
+  }
+
   next(state: GameState) {
     return {
       ...state,

@@ -9,6 +9,10 @@ export class AddPointsAction implements GameAction {
     return `Earn (${this.increment})`;
   }
 
+  isApplicable(state: GameState): boolean {
+    return true;
+  }
+
   next(state: GameState) {
     return new SetPointsAction(state.points + this.increment).next(state);
   }

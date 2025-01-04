@@ -5,6 +5,10 @@ import { GameAction, GameActionCreator } from '../game-actions';
 export class CardDrawFromHistoryActionCreator implements GameActionCreator {
   constructor(private readonly count: number) {}
 
+  isApplicable(state: GameState): boolean {
+    return state.cardHistory.length >= this.count;
+  }
+
   create(state: GameState): GameAction[] {
     const lastCardInHistory = state.cardHistory[state.cardHistory.length - 1];
     return [new CardAddAction([lastCardInHistory])];

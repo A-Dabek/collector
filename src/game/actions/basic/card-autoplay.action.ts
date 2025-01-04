@@ -3,24 +3,21 @@ import { findCardInLibrary } from '../../library/access';
 import { GameState } from '../../logic/engine';
 import { GameAction } from '../game-actions';
 
-export class CardAddAction implements GameAction {
+export class CardAutoplayAction implements GameAction {
   constructor(private readonly cards: CardName[]) {}
 
   get description(): string {
-    return `Draw (${this.cards.join(', ')})`;
+    return `Autoplay (${this.cards.join(', ')})`;
   }
 
   isApplicable(state: GameState): boolean {
-    return state.cards.length < state.space;
+    return true;
   }
 
   next(state: GameState) {
     return {
       ...state,
-      cards: [
-        ...state.cards,
-        ...this.cards.map((name) => findCardInLibrary(name)),
-      ],
+      autoPlayQueue: [...state.autoPlayQueue, ...this.cards],
     };
   }
 }

@@ -6,6 +6,10 @@ export class UnplayableAction implements GameAction {
     return `Unplayable`;
   }
 
+  isApplicable(state: GameState): boolean {
+    return false;
+  }
+
   next(state: GameState) {
     return state;
   }

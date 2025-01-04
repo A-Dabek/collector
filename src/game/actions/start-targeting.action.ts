@@ -9,6 +9,10 @@ export class StartTargetingAction implements GameAction {
     return 'Select a target';
   }
 
+  isApplicable(state: GameState): boolean {
+    return true;
+  }
+
   next(state: GameState) {
     return {
       ...state,

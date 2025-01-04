@@ -8,6 +8,10 @@ export class SetPointsAction implements GameAction {
     return `Set points to ${this.value}`;
   }
 
+  isApplicable(state: GameState): boolean {
+    return true;
+  }
+
   next(state: GameState) {
     const target = Math.min(this.value, state.maxPoints);
     return {

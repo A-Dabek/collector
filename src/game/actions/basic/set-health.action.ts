@@ -8,6 +8,10 @@ export class SetHealthAction implements GameAction {
     return `Set health to ${this.value}`;
   }
 
+  isApplicable(state: GameState): boolean {
+    return true;
+  }
+
   next(state: GameState) {
     const targetHealth = Math.min(this.value, state.maxHealth);
     return {

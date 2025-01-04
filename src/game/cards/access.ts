@@ -4,6 +4,7 @@ import { PaperBagOpenCard } from './common/paper-bag-open.card';
 import { PillCard } from './common/pill.card';
 import { SpikesInitCard } from './common/spikes-init.card';
 import { TokenCard } from './common/token.card';
+import { OuroborosCard } from './ouroboros.card';
 import { ParrotHeadCard } from './parrot-head.card';
 import { PiggyBankCard } from './piggy-bank.card';
 import { PlainPadlockCard } from './plain-padlock.card';
@@ -65,7 +66,8 @@ export type CardName =
   | 'spikes-half'
   | 'two-coins'
   | 'raise-zombie'
-  | 'parrot-head';
+  | 'parrot-head'
+  | 'ouroboros';
 
 export const PLAYABLE_LIBRARY: Record<CardName, new () => GameCard> = {
   //common
@@ -87,4 +89,5 @@ export const PLAYABLE_LIBRARY: Record<CardName, new () => GameCard> = {
   'hammer-break': HammerBreakCard,
   'raise-zombie': RaiseZombieCard,
   'parrot-head': ParrotHeadCard,
+  ouroboros: OuroborosCard,
 };

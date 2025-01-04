@@ -1,5 +1,5 @@
 import { Rarity } from '../../ui/rarity';
-import { CostHealthAction } from '../actions/cost-health.action';
+import { CardAutoplayAction } from '../actions/basic/card-autoplay.action';
 import { EffectWasteAction } from '../actions/basic/effect-waste.action';
 import { GameAction } from '../actions/game-actions';
 import { CardName } from '../cards/access';
@@ -7,12 +7,12 @@ import { GameCard } from '../cards/card';
 import { GameState } from '../logic/engine';
 import { BaseEffect } from './effect';
 
-export class PlainPadlockEffect extends BaseEffect {
-  override name: CardName = 'plain-padlock';
-  override rarity: Rarity = 'common';
+export class OuroborosEffect extends BaseEffect {
+  override name: CardName = 'ouroboros';
+  override rarity: Rarity = 'mythic';
 
   override get description(): string {
-    return 'Next card costs nothing';
+    return 'Next card is played infinitely many times';
   }
 
   override apply(
@@ -20,12 +20,10 @@ export class PlainPadlockEffect extends BaseEffect {
     actions: GameAction[],
     cardPlayed: GameCard,
   ): GameAction[] {
-    const firstCostHealthAction = actions.findIndex(
-      (action) => action instanceof CostHealthAction,
-    );
-    if (firstCostHealthAction !== -1) {
-      actions.splice(firstCostHealthAction, 1);
-    }
-    return [...actions, new EffectWasteAction([this])];
+    return [
+      ...actions,
+      new CardAutoplayAction(Array(10).fill(cardPlayed.name)),
+      new EffectWasteAction([this]),
+    ];
   }
 }

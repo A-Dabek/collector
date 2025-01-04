@@ -9,6 +9,10 @@ export class AddHealthAction implements GameAction {
     return `Heal (${this.increment})`;
   }
 
+  isApplicable(state: GameState): boolean {
+    return state.health + this.increment >= 0;
+  }
+
   next(state: GameState) {
     return new SetHealthAction(state.health + this.increment).next(state);
   }

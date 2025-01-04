@@ -9,6 +9,10 @@ export class CardWasteRandomActionCreator implements GameActionCreator {
     private readonly count: number,
   ) {}
 
+  isApplicable(state: GameState): boolean {
+    return state.cards.length >= this.count + 1;
+  }
+
   create(state: GameState): GameAction[] {
     const cardsOtherThanOwner = state.cards.filter(
       (card) => card.id !== this.ownerId,

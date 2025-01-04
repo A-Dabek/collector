@@ -8,6 +8,10 @@ export class SetSpaceAction implements GameAction {
     return `Set space to ${this.value}`;
   }
 
+  isApplicable(state: GameState): boolean {
+    return true;
+  }
+
   next(state: GameState) {
     return {
       ...state,

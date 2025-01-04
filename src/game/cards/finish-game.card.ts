@@ -10,6 +10,10 @@ export class FinishGameCard extends BasePlayableCard {
   override name: CardName = 'card-2-diamonds';
   override rarity = 'common' as const;
 
+  override costActions() {
+    return [];
+  }
+
   override play(state: GameState) {
     return [
       new SetPointsAction(0),

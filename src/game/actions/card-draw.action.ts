@@ -12,6 +12,10 @@ export class CardDrawAction implements GameAction {
     return `Draw (${this.count})`;
   }
 
+  isApplicable(state: GameState): boolean {
+    return state.space - state.cards.length >= this.count;
+  }
+
   next(state: GameState) {
     const randomCards = new Array(this.count).fill(0).map(getRandomCardName);
     const cardAdd = new CardAddAction(randomCards);

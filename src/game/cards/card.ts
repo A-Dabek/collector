@@ -79,7 +79,10 @@ export abstract class BasePlayableCard implements GameCard {
   }
 
   enabled(state: GameState): boolean {
-    return true;
+    return [...this.costActions(), ...this.actions].every((action) => {
+      console.log(this.name, this.id, action);
+      return action.isApplicable(state);
+    });
   }
 
   serialize(state: GameState): CardState {

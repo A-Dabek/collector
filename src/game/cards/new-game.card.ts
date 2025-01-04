@@ -18,13 +18,18 @@ export class NewGameCard extends BasePlayableCard {
     super();
   }
 
+  override costActions() {
+    return [];
+  }
+
   override play(state: GameState) {
     const initialCards: CardName[] = [
       'token',
-      'token',
       'raise-zombie',
       'parrot-head',
+      'ouroboros',
     ];
+    // const initialCards: CardName[] = ['piggy-bank', 'spikes-init'];
     return [
       new SetHealthAction(this.initialState.maxHealth),
       new SetSpaceAction(this.initialState.space),

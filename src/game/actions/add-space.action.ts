@@ -9,6 +9,10 @@ export class AddSpaceAction implements GameAction {
     return `Expand (${this.increment})`;
   }
 
+  isApplicable(state: GameState): boolean {
+    return true;
+  }
+
   next(state: GameState) {
     return new SetSpaceAction(state.space + this.increment).next(state);
   }

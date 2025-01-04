@@ -13,6 +13,10 @@ export class CardWasteAction implements GameAction {
     return `Waste (${this.ids.length})`;
   }
 
+  isApplicable(state: GameState): boolean {
+    return true;
+  }
+
   next(state: GameState) {
     return {
       ...state,

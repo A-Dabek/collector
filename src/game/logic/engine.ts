@@ -5,6 +5,7 @@ import { GameCard } from '../cards/card';
 import { FinishGameCard } from '../cards/finish-game.card';
 import { NewGameCard } from '../cards/new-game.card';
 import { GameEffect } from '../effects/effect';
+import { findCardInLibrary } from '../library/access';
 
 export interface GameState {
   points: number;
@@ -15,6 +16,7 @@ export interface GameState {
   cards: GameCard[];
   effects: GameEffect[];
   cardHistory: CardName[];
+  autoPlayQueue: CardName[];
 }
 
 export class GameEngine {
@@ -27,6 +29,7 @@ export class GameEngine {
     cards: [],
     effects: [],
     cardHistory: [],
+    autoPlayQueue: [],
   };
 
   private state = GameEngine.initialState;
@@ -42,18 +45,8 @@ export class GameEngine {
   }
 
   play(id: number): GameUiState[] {
-    const card = this.state.cards.find((card) => card.id === id);
-    if (!card || !card.enabled) {
-      throw new Error('Card not found or not enabled');
-    }
-
-    // if (!card.targetSource && card.target) {
-    //   return this.playCard({
-    //     next: (state) => card.target!(state, card),
-    //   });
-    // } else {
+    const card = this.state.cards.find((card) => card.id === id) as GameCard;
     return this.playCard(card);
-    // }
   }
 
   target(id: number): GameUiState[] {
@@ -69,14 +62,34 @@ export class GameEngine {
     throw new Error('Not implemented');
   }
 
-  private playCard(playable: GameCard): GameUiState[] {
-    const actions = playable.play(this.state);
-    const postEffectActions = this.applyEffects(actions);
+  private playCard(card: GameCard): GameUiState[] {
+    if (!card || !card.enabled(this.state)) {
+      console.warn('Card not found or not enabled', card);
+      this.state.autoPlayQueue = [];
+      return [];
+    }
+
+    const actions = card.play(this.state);
+    const postEffectActions = this.applyEffects(card, actions);
     const reactions = this.reactToActions(postEffectActions);
-    console.log({ postEffectActions });
-    console.log({ actions });
-    console.log({ reactions });
-    return reactions.map((reaction) => {
+
+    const snapshots = this.applyActions([...postEffectActions, ...reactions]);
+    snapshots.push(...this.playAutoPlayQueue());
+    return snapshots;
+  }
+
+  private playAutoPlayQueue(): GameUiState[] {
+    const snapshots: GameUiState[] = [];
+    while (this.state.autoPlayQueue.length > 0) {
+      const cardName = this.state.autoPlayQueue.shift() as CardName;
+      const card = findCardInLibrary(cardName);
+      snapshots.push(...this.playCard(card));
+    }
+    return snapshots;
+  }
+
+  private applyActions(actions: GameAction[]): GameUiState[] {
+    return actions.map((reaction) => {
       this.state = reaction.next(this.state);
       console.log(reaction, this.state);
       return {
@@ -89,9 +102,9 @@ export class GameEngine {
     });
   }
 
-  private applyEffects(actions: GameAction[]) {
+  private applyEffects(card: GameCard, actions: GameAction[]) {
     return this.state.effects.reduce(
-      (finalActions, effect) => effect.apply(this.state, finalActions),
+      (finalActions, effect) => effect.apply(this.state, finalActions, card),
       actions,
     );
   }
@@ -102,9 +115,9 @@ export class GameEngine {
     });
     if (reactions.length > 0) {
       // react to reactions recursively
-      return [...actions, ...this.reactToActions(reactions)];
+      return [...reactions, ...this.reactToActions(reactions)];
     }
-    return actions;
+    return [];
   }
 
   private reactToAction(action: GameAction): GameAction[] {
