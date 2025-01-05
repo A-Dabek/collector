@@ -23,7 +23,9 @@ export class GameRunService {
     return this.engine.play(card.id);
   }
 
-  async target(card: CardState): Promise<GameUiState[]> {
-    return this.engine.target(card.id);
+  async target(cardStates: CardState[]): Promise<GameUiState[]> {
+    const targetIds = cardStates.map((card) => card.id);
+
+    return this.engine.target(targetIds);
   }
 }

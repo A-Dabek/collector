@@ -46,10 +46,13 @@ import { GameMenuComponent } from './ui/menu.component';
         (highlight)="onHighlight($event)"
       />
       <app-game-board
+        [isTargeting]="state().mode === 'target'"
+        [targetCount]="state().modeTarget?.count || 0"
         [space]="state().space"
         [cards]="state().cards"
         (play)="onPlay($event)"
         (highlight)="onHighlight($event)"
+        (target)="onTarget($event)"
       />
       <app-game-description
         class="block mt-auto mb-auto"
@@ -102,6 +105,11 @@ export class GameViewComponent implements OnInit {
   async onPlay(card: CardState) {
     this.activeItem.set(undefined);
     const uiActions = await this.gameRunService.play(card);
+    this.onNewActions(uiActions);
+  }
+
+  async onTarget(targets: CardState[]) {
+    const uiActions = await this.gameRunService.target(targets);
     this.onNewActions(uiActions);
   }
 

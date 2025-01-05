@@ -21,7 +21,6 @@ export interface CardState extends Describable {
   enabled: boolean;
   targetSource: boolean;
   targetCandidate: boolean;
-  targetDest: boolean;
 }
 
 export interface GameCard {
@@ -92,9 +91,8 @@ export abstract class BasePlayableCard implements GameCard {
       rarity: this.rarity,
       description: this.description,
       enabled: this.enabled(state),
-      targetSource: false,
-      targetCandidate: false,
-      targetDest: false,
+      targetSource: state.modeTarget?.source.id === this.id,
+      targetCandidate: !!state.modeTarget?.candidateIds.includes(this.id),
     };
   }
 }

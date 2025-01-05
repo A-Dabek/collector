@@ -32,18 +32,18 @@ import { CardState } from '../cards/card';
       <app-icon
         class="cursor-pointer"
         [@target]="{
-          value: card.targetCandidate && animateEnabled(),
+          value: isTargetCandidate() && animateEnabled(),
           params: {},
         }"
         [@targeting]="{
-          value: card.targetSource && animateEnabled(),
+          value: isTargetSource() && animateEnabled(),
           params: {},
         }"
         [name]="card.name"
-        [color]="card.enabled ? '' : rarityDisabledColors[card.rarity]"
+        [color]="isEnabled() ? '' : rarityDisabledColors[card.rarity]"
         [rarity]="card.rarity"
         [size]="size()"
-        (click)="onUsage()"
+        (click)="usage.emit()"
       />
     </div>
   `,
@@ -58,22 +58,11 @@ export class CardComponent {
 
   @HostBinding() class = 'block';
   readonly size = input<number>(5);
-  readonly card = input<CardState>();
+  readonly card = input.required<CardState>();
+  readonly isEnabled = input<boolean>(true);
+  readonly isTargetSource = input<boolean>(false);
+  readonly isTargetCandidate = input<boolean>(false);
   readonly usage = output();
   readonly highlight = output();
-  animate = false;
   readonly animateEnabled = computed(() => CardComponent.timerS());
-
-  readonly isTarget = computed(() => this.card()?.targetCandidate);
-  readonly isTargeting = computed(() => this.card()?.targetSource);
-  readonly isEnabled = computed(
-    () => this.card()?.enabled && !this.isTarget() && !this.isTargeting(),
-  );
-
-  onUsage() {
-    if (this.card()?.enabled) {
-      this.animate = !this.animate;
-      this.usage.emit();
-    }
-  }
 }

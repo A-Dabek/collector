@@ -32,9 +32,6 @@ import { RaiseZombieCard } from './raise-zombie.card';
 - re-roll all cards
 - shrink spaces with each distinct rarity
 
-(needs targeting)
-- ouroboros - play a card infinitely as long as it's possible (needs targetting)
-
 (needs options)
 - shop - buy a card for points
 - goldfish/djinn - wishes

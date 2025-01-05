@@ -1,6 +1,8 @@
 import { Rarity } from '../../../ui/rarity';
+import { CardWasteAction } from '../../actions/basic/card-waste.action';
+import { CardWasteTargetedActionCreator } from '../../actions/creators/card-waste-targeted-action.creator';
 import { GameAction } from '../../actions/game-actions';
-import { StartTargetingAction } from '../../actions/start-targeting.action';
+import { TargetStartAction } from '../../actions/target-start.action';
 import { GameState } from '../../logic/engine';
 import { CardName } from '../access';
 import { BasePlayableCard } from '../card';
@@ -8,17 +10,8 @@ import { BasePlayableCard } from '../card';
 export class HammerBreakCard extends BasePlayableCard {
   override name: CardName = 'hammer-break';
   override rarity: Rarity = 'uncommon';
-
-  // play(state: GameState, card: Card) {
-  //   const targets = state.cards.filter((card) => card.targetCandidate);
-  //   return new CardWasteAction(targets);
-  // }
-
-  target(state: GameState): GameAction[] {
-    return [new StartTargetingAction(this)];
-  }
-
-  override enabled(state: GameState): boolean {
-    return state.cards.length > 1;
-  }
+  override actions = [
+    new TargetStartAction(this),
+    new CardWasteTargetedActionCreator(),
+  ];
 }

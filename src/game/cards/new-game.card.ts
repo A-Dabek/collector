@@ -24,10 +24,12 @@ export class NewGameCard extends BasePlayableCard {
 
   override play(state: GameState) {
     const initialCards: CardName[] = [
-      'token',
+      // 'token',
       'raise-zombie',
       'parrot-head',
-      'ouroboros',
+      // 'ouroboros',
+      'piggy-bank',
+      'hammer-break',
     ];
     // const initialCards: CardName[] = ['piggy-bank', 'spikes-init'];
     return [
