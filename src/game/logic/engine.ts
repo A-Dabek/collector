@@ -48,13 +48,13 @@ export class GameEngine {
   readonly snapshots$ = this._snapshots$.asObservable();
   readonly targetReady$ = new Subject<{ ids: number[] }>();
 
-  playCard(card: GameCard) {
-    this.applyCardActions(card).then();
+  async playCard(card: GameCard) {
+    await this.applyCardActions(card);
   }
 
-  playCardId(id: number) {
+  async playCardId(id: number) {
     const card = this.state.cards.find((card) => card.id === id) as GameCard;
-    this.playCard(card);
+    await this.playCard(card);
   }
 
   private publishCurrentSnapshot() {

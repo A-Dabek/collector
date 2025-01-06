@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Card Token use 1`] = `
+{
+  "autoPlayQueue": [],
+  "cardHistory": [
+    "token",
+  ],
+  "cards": [],
+  "effects": [],
+  "health": 9,
+  "maxHealth": 10,
+  "maxPoints": 10,
+  "mode": "play",
+  "points": 1,
+  "space": 5,
+}
+`;
