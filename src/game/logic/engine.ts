@@ -1,12 +1,8 @@
-import { signal } from '@angular/core';
-import { BehaviorSubject, firstValueFrom, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, firstValueFrom, Subject } from 'rxjs';
 import { GameAction } from '../actions/game-actions';
-import { TargetStartAction } from '../actions/target-start.action';
 import { GameUiState } from '../actions/ui-actions';
 import { CardName } from '../cards/access';
 import { GameCard } from '../cards/card';
-import { FinishGameCard } from '../cards/finish-game.card';
-import { NewGameCard } from '../cards/new-game.card';
 import { GameEffect } from '../effects/effect';
 import { findCardInLibrary } from '../library/access';
 
@@ -46,103 +42,99 @@ export class GameEngine {
 
   private state = GameEngine.initialState;
 
-  private readonly _snapshots$ = new BehaviorSubject<GameUiState[]>([]);
+  private readonly _snapshots$ = new BehaviorSubject<GameUiState>(
+    this.createSnapshot(),
+  );
   readonly snapshots$ = this._snapshots$.asObservable();
   readonly targetReady$ = new Subject<{ ids: number[] }>();
 
-  startNewGame(level: number) {
-    const newGame = new NewGameCard(level);
-    this.playCard(newGame);
+  playCard(card: GameCard) {
+    this.applyCardActions(card).then();
   }
 
-  finishCurrentGame() {
-    const finishGame = new FinishGameCard();
-    this.playCard(finishGame);
-  }
-
-  play(id: number) {
+  playCardId(id: number) {
     const card = this.state.cards.find((card) => card.id === id) as GameCard;
     this.playCard(card);
   }
 
-  private async playCard(card: GameCard) {
-    if (!card || !card.enabled(this.state)) {
-      console.warn('Card not found or not enabled', card);
+  private publishCurrentSnapshot() {
+    const snapshot = this.createSnapshot();
+    console.debug('[ENGINE] Snapshot', snapshot);
+    this._snapshots$.next(snapshot);
+  }
+
+  private async waitForTargets() {
+    const targets = await firstValueFrom(this.targetReady$);
+    this.state.mode = 'play';
+    this.state.modeTarget = undefined;
+    return targets.ids.map(
+      (id) => this.state.cards.find((card) => card.id === id)!,
+    );
+  }
+
+  private async applyCardActions(card: GameCard) {
+    if (!card || !card.enabled(this.state) || card.isWasted) {
+      console.warn('[ENGINE] Cannot play', card, {
+        enabled: card?.enabled(this.state),
+        isWasted: card?.isWasted,
+      });
       this.state.autoPlayQueue = [];
       return;
     }
 
-    let actions = card.play(this.state);
-    const targetAction = actions.findIndex(
-      (action) => action instanceof TargetStartAction,
-    );
+    const actions = card.play(this.state);
 
-    if (targetAction >= 0) {
-      const preTargetActions = actions.slice(0, targetAction + 1);
-      const snapshots = this.applyActions(preTargetActions);
-      this._snapshots$.next(snapshots);
-
-      const targets = await this.waitForTarget();
-      const postTargetActions = actions.slice(targetAction + 1);
-      actions = [...postTargetActions, ...card.target!(this.state, targets)];
+    let nextAction = actions.shift();
+    while (nextAction) {
+      const newActions = await this.applyCardAction(card, nextAction);
+      actions.unshift(...newActions);
+      nextAction = actions.shift();
     }
 
-    const postEffectActions = this.applyEffects(card, actions);
-    const reactions = this.reactToActions(postEffectActions);
-
-    const snapshots = this.applyActions([...postEffectActions, ...reactions]);
-
-    this._snapshots$.next(snapshots);
     await this.playAutoPlayQueue();
   }
 
-  private async waitForTarget() {
-    const targets = await firstValueFrom(this.targetReady$);
-    const targetCards = targets.ids.map(
-      (id) => this.state.cards.find((card) => card.id === id)!,
-    );
-    this.state.mode = 'play';
-    this.state.modeTarget = undefined;
-    return targetCards;
-  }
-
-  private async playAutoPlayQueue() {
-    while (this.state.autoPlayQueue.length > 0) {
-      const cardName = this.state.autoPlayQueue.shift() as CardName;
-      const card = findCardInLibrary(cardName);
-      await this.playCard(card);
+  private async applyCardAction(
+    card: GameCard,
+    action: GameAction,
+  ): Promise<GameAction[]> {
+    console.debug('[ENGINE] Processing', card, action);
+    const postEffectActions = this.applyEffectsToAction(card, action);
+    console.debug('[ENGINE] Post effects', postEffectActions);
+    this.applyActionToState(action);
+    this.publishCurrentSnapshot();
+    const reactions = this.reactToAction(action);
+    console.debug('[ENGINE] Reactions', reactions);
+    const additionalActions = [...postEffectActions, ...reactions];
+    this.state.cards = this.state.cards.filter((card) => !card.isWasted);
+    if (this.state.mode === 'target') {
+      const targets = await this.waitForTargets();
+      const targetActions = card.target!(this.state, targets);
+      console.debug('[ENGINE] Target actions', targetActions);
+      // How to modify the target actions? should an effect overwrite mode to 'play'?
+      return [...targetActions, ...additionalActions];
     }
+    return additionalActions;
   }
 
-  private applyActions(actions: GameAction[]): GameUiState[] {
-    return actions.map((reaction) => {
-      this.state = reaction.next(this.state);
-      return {
-        ...this.state,
-        cards: this.state.cards.map((card) => card.serialize(this.state)),
-        effects: this.state.effects.map((effect) =>
-          effect.serialize(this.state),
-        ),
-      };
-    });
-  }
-
-  private applyEffects(card: GameCard, actions: GameAction[]) {
-    return this.state.effects.reduce(
-      (finalActions, effect) => effect.apply(this.state, finalActions, card),
-      actions,
+  private applyEffectsToAction(card: GameCard, action: GameAction) {
+    return this.state.effects.flatMap((effect) =>
+      effect.apply(this.state, card, action),
     );
   }
 
-  private reactToActions(actions: GameAction[]): GameAction[] {
-    const reactions = actions.flatMap((action) => {
-      return this.reactToAction(action);
-    });
-    if (reactions.length > 0) {
-      // react to reactions recursively
-      return [...reactions, ...this.reactToActions(reactions)];
-    }
-    return [];
+  private applyActionToState(action: GameAction) {
+    this.state = action.next(this.state);
+  }
+
+  private createSnapshot(): GameUiState {
+    return {
+      ...this.state,
+      cards: this.state.cards
+        .filter((card) => !card.isWasted)
+        .map((card) => card.serialize(this.state)),
+      effects: this.state.effects.map((effect) => effect.serialize(this.state)),
+    };
   }
 
   private reactToAction(action: GameAction): GameAction[] {
@@ -150,5 +142,13 @@ export class GameEngine {
       if (!card.onAction) return [];
       return card.onAction(this.state, action);
     });
+  }
+
+  private async playAutoPlayQueue() {
+    while (this.state.autoPlayQueue.length > 0) {
+      const cardName = this.state.autoPlayQueue.shift() as CardName;
+      const card = findCardInLibrary(cardName);
+      await this.applyCardActions(card);
+    }
   }
 }

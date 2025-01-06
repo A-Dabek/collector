@@ -1,6 +1,6 @@
 import { Rarity } from '../../ui/rarity';
-import { CostHealthAction } from '../actions/cost-health.action';
 import { EffectWasteAction } from '../actions/basic/effect-waste.action';
+import { CostHealthAction } from '../actions/cost-health.action';
 import { GameAction } from '../actions/game-actions';
 import { CardName } from '../cards/access';
 import { GameCard } from '../cards/card';
@@ -17,15 +17,12 @@ export class PlainPadlockEffect extends BaseEffect {
 
   override apply(
     state: GameState,
-    actions: GameAction[],
     cardPlayed: GameCard,
+    action: GameAction,
   ): GameAction[] {
-    const firstCostHealthAction = actions.findIndex(
-      (action) => action instanceof CostHealthAction,
-    );
-    if (firstCostHealthAction !== -1) {
-      actions.splice(firstCostHealthAction, 1);
+    if (action instanceof CostHealthAction) {
+      action.makeFree();
     }
-    return [...actions, new EffectWasteAction([this])];
+    return [new EffectWasteAction([this])];
   }
 }

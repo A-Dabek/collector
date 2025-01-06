@@ -19,8 +19,8 @@ export interface GameEffect {
 
   apply(
     state: GameState,
-    actions: GameAction[],
     cardPlayed: GameCard,
+    action: GameAction,
   ): GameAction[];
 
   serialize(state: GameState): EffectState;
@@ -36,8 +36,8 @@ export abstract class BaseEffect implements GameEffect {
 
   abstract apply(
     state: GameState,
-    actions: GameAction[],
     cardPlayed: GameCard,
+    action: GameAction,
   ): GameAction[];
 
   serialize(state: GameState): EffectState {

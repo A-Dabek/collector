@@ -18,9 +18,9 @@ export class CardWasteAction implements GameAction {
   }
 
   next(state: GameState) {
-    return {
-      ...state,
-      cards: state.cards.filter((card) => !this.ids.includes(card.id)),
-    };
+    this.ids.forEach((id) => {
+      state.cards.find((card) => card.id === id)?.waste();
+    });
+    return state;
   }
 }

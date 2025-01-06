@@ -5,7 +5,7 @@ import { GameAction } from './game-actions';
 
 export class CostHealthAction implements GameAction {
   private readonly addHealthAction: AddHealthAction;
-  private readonly amount: number;
+  private amount: number;
 
   constructor(rarity: Rarity) {
     this.amount = this.rarityToNumber(rarity);
@@ -27,5 +27,9 @@ export class CostHealthAction implements GameAction {
   private rarityToNumber(rarity: Rarity): number {
     const index = rarities.findIndex((r) => r === rarity);
     return index + 1; // Adding 1 to transform 0-based index to 1-based number
+  }
+
+  makeFree() {
+    this.amount = 0;
   }
 }

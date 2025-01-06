@@ -17,11 +17,10 @@ export class OuroborosEffect extends BaseEffect {
 
   override apply(
     state: GameState,
-    actions: GameAction[],
     cardPlayed: GameCard,
+    action: GameAction,
   ): GameAction[] {
     return [
-      ...actions,
       new CardAutoplayAction(Array(10).fill(cardPlayed.name)),
       new EffectWasteAction([this]),
     ];

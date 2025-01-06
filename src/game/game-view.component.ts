@@ -8,14 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import {
-  BehaviorSubject,
-  filter,
-  interval,
-  startWith,
-  switchMap,
-  tap,
-} from 'rxjs';
+import { concatMap, delay, of, tap } from 'rxjs';
 import { GameRunService } from '../services/game-run.service';
 import { GameUiState } from './actions/ui-actions';
 import { CardState, Describable } from './cards/card';
@@ -81,28 +74,19 @@ export class GameViewComponent implements OnInit {
     effects: [],
   });
 
-  readonly snapshots = signal<GameUiState[]>([]);
   readonly activeItem = signal<Describable | undefined>(undefined);
-  private readonly now$ = new BehaviorSubject(0);
-
-  constructor() {
-    this.now$
-      .pipe(
-        takeUntilDestroyed(),
-        switchMap(() => interval(500).pipe(startWith(0))),
-      )
-      .subscribe(() => {
-        this.nextAnimation();
-      });
-  }
 
   async ngOnInit() {
-    await this.startNewGame();
+    this.gameRunService.newGame();
     this.gameRunService.snapshots$
       .pipe(
         takeUntilDestroyed(this.destroy$),
-        filter((snapshots) => snapshots.length > 0),
-        tap((snapshots) => this.onNewActions(snapshots)),
+        concatMap((snapshot) =>
+          of(snapshot).pipe(
+            tap((snapshot) => this.state.set(snapshot)),
+            delay(250),
+          ),
+        ),
       )
       .subscribe();
   }
@@ -127,28 +111,5 @@ export class GameViewComponent implements OnInit {
 
   async onHighlight(describable: Describable) {
     this.activeItem.set(describable);
-  }
-
-  private onNewActions(snapshots: GameUiState[]) {
-    this.snapshots.update((oldSnapshots) => {
-      const allSnapshots = [...oldSnapshots, ...snapshots];
-      // update `enabled` of every card in every snapshot to be the same as the last snapshot
-      const lastSnapshot = allSnapshots[allSnapshots.length - 1].cards;
-      allSnapshots.forEach((snapshot) => {
-        snapshot.cards.forEach((card) => {
-          const lastCard = lastSnapshot.find((c) => c.id === card.id);
-          if (lastCard) card.enabled = lastCard.enabled;
-        });
-      });
-      return allSnapshots;
-    });
-    this.now$.next(0);
-  }
-
-  private nextAnimation() {
-    const current = this.snapshots()[0];
-    if (!current) return;
-    this.snapshots.update(([, ...rest]) => rest);
-    this.state.set(current);
   }
 }

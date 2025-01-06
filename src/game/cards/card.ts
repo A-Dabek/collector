@@ -30,6 +30,8 @@ export interface GameCard {
 
   get description(): string;
 
+  get isWasted(): boolean;
+
   play(state: GameState): GameAction[];
 
   target?(state: GameState, targets: GameCard[]): GameAction[];
@@ -40,12 +42,15 @@ export interface GameCard {
 
   enabled(state: GameState): boolean;
 
+  waste(): void;
+
   serialize(state: GameState): CardState;
 }
 
 export abstract class BasePlayableCard implements GameCard {
   protected actions: (GameAction | GameActionCreator)[] = [];
   protected reactions: GameReactionCreator[] = [];
+  protected wasted = false;
 
   abstract readonly name: CardName;
   abstract readonly rarity: Rarity;
@@ -55,6 +60,14 @@ export abstract class BasePlayableCard implements GameCard {
     return [...this.costActions(), ...this.actions, ...this.reactions]
       .map((action) => action.description)
       .join(', ');
+  }
+
+  get isWasted(): boolean {
+    return this.wasted;
+  }
+
+  waste(): void {
+    this.wasted = true;
   }
 
   protected costActions(): GameAction[] {

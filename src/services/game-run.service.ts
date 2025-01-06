@@ -1,5 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { CardState } from '../game/cards/card';
+import { FinishGameCard } from '../game/cards/finish-game.card';
+import { NewGameCard } from '../game/cards/new-game.card';
 import { GameEngine } from '../game/logic/engine';
 import { GameRunPersistenceService } from './game-run-persistence.service';
 
@@ -14,16 +16,16 @@ export class GameRunService {
 
   async newGame() {
     const level = await this.persistenceService.getMaxPoints();
-    this.engine.startNewGame(level);
+    this.engine.playCard(new NewGameCard(level));
   }
 
   async finish(win: boolean) {
     await this.persistenceService.updateMaxPoints(win ? 1 : -1);
-    this.engine.finishCurrentGame();
+    this.engine.playCard(new FinishGameCard());
   }
 
   play(card: CardState) {
-    this.engine.play(card.id);
+    this.engine.playCardId(card.id);
   }
 
   target(cardStates: CardState[]) {
