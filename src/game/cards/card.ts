@@ -32,7 +32,7 @@ export interface GameCard {
 
   play(state: GameState): GameAction[];
 
-  target?(state: GameState): GameAction[];
+  target?(state: GameState, targets: GameCard[]): GameAction[];
 
   onAction?(state: GameState, action: GameAction): GameAction[];
 
@@ -79,7 +79,6 @@ export abstract class BasePlayableCard implements GameCard {
 
   enabled(state: GameState): boolean {
     return [...this.costActions(), ...this.actions].every((action) => {
-      console.log(this.name, this.id, action);
       return action.isApplicable(state);
     });
   }

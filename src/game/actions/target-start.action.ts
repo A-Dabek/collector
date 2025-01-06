@@ -22,9 +22,7 @@ export class TargetStartAction implements GameAction {
         candidateIds: state.cards
           .filter((card) => card.id !== this.source.id)
           .map((card) => card.id),
-        selectedIds: [],
         count: 1,
-        actionsQueue: [],
       },
     };
   }

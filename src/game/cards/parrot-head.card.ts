@@ -10,6 +10,13 @@ export class ParrotHeadCard extends BasePlayableCard {
   override name: CardName = 'parrot-head';
   override rarity: Rarity = 'rare';
 
+  override enabled(state: GameState): boolean {
+    if (state.cardHistory.length === 0) {
+      return false;
+    }
+    return this.getLastPlayedCard(state).enabled(state);
+  }
+
   override play(state: GameState): GameAction[] {
     return [
       new CardPlayWasteAction(this),
@@ -17,12 +24,7 @@ export class ParrotHeadCard extends BasePlayableCard {
     ];
   }
 
-  override enabled(state: GameState): boolean {
-    if (state.cardHistory.length === 0) {
-      return false;
-    }
-    return this.getLastPlayedCard(state).enabled(state);
-  }
+  // FIXME cannot handle .target cards
 
   private getLastPlayedCard(state: GameState): GameCard {
     const lastCardInHistory = state.cardHistory[state.cardHistory.length - 1];

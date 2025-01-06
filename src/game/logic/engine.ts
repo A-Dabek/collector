@@ -1,3 +1,5 @@
+import { signal } from '@angular/core';
+import { BehaviorSubject, firstValueFrom, Observable, Subject } from 'rxjs';
 import { GameAction } from '../actions/game-actions';
 import { TargetStartAction } from '../actions/target-start.action';
 import { GameUiState } from '../actions/ui-actions';
@@ -25,8 +27,6 @@ export interface GameState {
     source: GameCard;
     candidateIds: number[];
     count: number;
-    selectedIds: number[];
-    actionsQueue: GameAction[];
   };
 }
 
@@ -46,47 +46,30 @@ export class GameEngine {
 
   private state = GameEngine.initialState;
 
-  startNewGame(level: number): GameUiState[] {
+  private readonly _snapshots$ = new BehaviorSubject<GameUiState[]>([]);
+  readonly snapshots$ = this._snapshots$.asObservable();
+  readonly targetReady$ = new Subject<{ ids: number[] }>();
+
+  startNewGame(level: number) {
     const newGame = new NewGameCard(level);
-    return this.playCard(newGame);
+    this.playCard(newGame);
   }
 
-  finishCurrentGame(): GameUiState[] {
+  finishCurrentGame() {
     const finishGame = new FinishGameCard();
-    return this.playCard(finishGame);
+    this.playCard(finishGame);
   }
 
-  play(id: number): GameUiState[] {
+  play(id: number) {
     const card = this.state.cards.find((card) => card.id === id) as GameCard;
-    return this.playCard(card);
+    this.playCard(card);
   }
 
-  target(targets: number[]): GameUiState[] {
-    if (!this.state.modeTarget) {
-      throw new Error('Game is not in target mode.');
-    }
-    this.state.modeTarget.selectedIds = targets;
-    this.state.mode = 'play';
-
-    const actions = this.state.modeTarget.actionsQueue;
-    this.state.modeTarget.actionsQueue = [];
-    const postEffectActions = this.applyEffects(
-      this.state.modeTarget.source,
-      actions,
-    );
-    const reactions = this.reactToActions(postEffectActions);
-    // if target happens again it won't work
-
-    const snapshots = this.applyActions([...postEffectActions, ...reactions]);
-    snapshots.push(...this.playAutoPlayQueue());
-    return snapshots;
-  }
-
-  private playCard(card: GameCard): GameUiState[] {
+  private async playCard(card: GameCard) {
     if (!card || !card.enabled(this.state)) {
       console.warn('Card not found or not enabled', card);
       this.state.autoPlayQueue = [];
-      return [];
+      return;
     }
 
     let actions = card.play(this.state);
@@ -96,36 +79,44 @@ export class GameEngine {
 
     if (targetAction >= 0) {
       const preTargetActions = actions.slice(0, targetAction + 1);
-      const postTargetActions = actions.slice(targetAction + 1);
-      console.log({ preTargetActions }, { postTargetActions });
-
       const snapshots = this.applyActions(preTargetActions);
-      this.state.modeTarget!.actionsQueue = [...postTargetActions];
-      return snapshots;
+      this._snapshots$.next(snapshots);
+
+      const targets = await this.waitForTarget();
+      const postTargetActions = actions.slice(targetAction + 1);
+      actions = [...postTargetActions, ...card.target!(this.state, targets)];
     }
 
     const postEffectActions = this.applyEffects(card, actions);
     const reactions = this.reactToActions(postEffectActions);
 
     const snapshots = this.applyActions([...postEffectActions, ...reactions]);
-    snapshots.push(...this.playAutoPlayQueue());
-    return snapshots;
+
+    this._snapshots$.next(snapshots);
+    await this.playAutoPlayQueue();
   }
 
-  private playAutoPlayQueue(): GameUiState[] {
-    const snapshots: GameUiState[] = [];
+  private async waitForTarget() {
+    const targets = await firstValueFrom(this.targetReady$);
+    const targetCards = targets.ids.map(
+      (id) => this.state.cards.find((card) => card.id === id)!,
+    );
+    this.state.mode = 'play';
+    this.state.modeTarget = undefined;
+    return targetCards;
+  }
+
+  private async playAutoPlayQueue() {
     while (this.state.autoPlayQueue.length > 0) {
       const cardName = this.state.autoPlayQueue.shift() as CardName;
       const card = findCardInLibrary(cardName);
-      snapshots.push(...this.playCard(card));
+      await this.playCard(card);
     }
-    return snapshots;
   }
 
   private applyActions(actions: GameAction[]): GameUiState[] {
     return actions.map((reaction) => {
       this.state = reaction.next(this.state);
-      console.log(reaction, this.state);
       return {
         ...this.state,
         cards: this.state.cards.map((card) => card.serialize(this.state)),
@@ -156,9 +147,7 @@ export class GameEngine {
 
   private reactToAction(action: GameAction): GameAction[] {
     return this.state.cards.flatMap((card) => {
-      if (!card.onAction) {
-        return [];
-      }
+      if (!card.onAction) return [];
       return card.onAction(this.state, action);
     });
   }

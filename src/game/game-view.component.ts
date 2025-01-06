@@ -2,12 +2,20 @@ import { NgIf } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   inject,
   OnInit,
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { BehaviorSubject, interval, startWith, switchMap } from 'rxjs';
+import {
+  BehaviorSubject,
+  filter,
+  interval,
+  startWith,
+  switchMap,
+  tap,
+} from 'rxjs';
 import { GameRunService } from '../services/game-run.service';
 import { GameUiState } from './actions/ui-actions';
 import { CardState, Describable } from './cards/card';
@@ -65,6 +73,7 @@ import { GameMenuComponent } from './ui/menu.component';
 })
 export class GameViewComponent implements OnInit {
   private readonly gameRunService = inject(GameRunService);
+  private readonly destroy$ = inject(DestroyRef);
 
   readonly state = signal<GameUiState>({
     ...GameEngine.initialState,
@@ -89,28 +98,31 @@ export class GameViewComponent implements OnInit {
 
   async ngOnInit() {
     await this.startNewGame();
+    this.gameRunService.snapshots$
+      .pipe(
+        takeUntilDestroyed(this.destroy$),
+        filter((snapshots) => snapshots.length > 0),
+        tap((snapshots) => this.onNewActions(snapshots)),
+      )
+      .subscribe();
   }
 
   private async startNewGame() {
-    const uiActions = await this.gameRunService.newGame();
-    this.onNewActions(uiActions);
+    await this.gameRunService.newGame();
   }
 
   async onRestart() {
-    const uiActions = await this.gameRunService.finish(false);
-    this.onNewActions(uiActions);
+    await this.gameRunService.finish(false);
     await this.startNewGame();
   }
 
   async onPlay(card: CardState) {
     this.activeItem.set(undefined);
-    const uiActions = await this.gameRunService.play(card);
-    this.onNewActions(uiActions);
+    this.gameRunService.play(card);
   }
 
   async onTarget(targets: CardState[]) {
-    const uiActions = await this.gameRunService.target(targets);
-    this.onNewActions(uiActions);
+    this.gameRunService.target(targets);
   }
 
   async onHighlight(describable: Describable) {
@@ -118,7 +130,6 @@ export class GameViewComponent implements OnInit {
   }
 
   private onNewActions(snapshots: GameUiState[]) {
-    this.state.update((state) => ({ ...state }));
     this.snapshots.update((oldSnapshots) => {
       const allSnapshots = [...oldSnapshots, ...snapshots];
       // update `enabled` of every card in every snapshot to be the same as the last snapshot
@@ -126,9 +137,7 @@ export class GameViewComponent implements OnInit {
       allSnapshots.forEach((snapshot) => {
         snapshot.cards.forEach((card) => {
           const lastCard = lastSnapshot.find((c) => c.id === card.id);
-          if (lastCard) {
-            card.enabled = lastCard.enabled;
-          }
+          if (lastCard) card.enabled = lastCard.enabled;
         });
       });
       return allSnapshots;
@@ -138,14 +147,8 @@ export class GameViewComponent implements OnInit {
 
   private nextAnimation() {
     const current = this.snapshots()[0];
-    if (!current) {
-      // this.state.update((state) => ({ ...state }));
-      return;
-    }
-    console.log('[UI] snapshot', current);
+    if (!current) return;
     this.snapshots.update(([, ...rest]) => rest);
     this.state.set(current);
   }
-
-  protected readonly history = history;
 }

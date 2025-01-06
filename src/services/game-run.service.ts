@@ -1,5 +1,4 @@
 import { inject, Injectable } from '@angular/core';
-import { GameUiState } from '../game/actions/ui-actions';
 import { CardState } from '../game/cards/card';
 import { GameEngine } from '../game/logic/engine';
 import { GameRunPersistenceService } from './game-run-persistence.service';
@@ -9,23 +8,26 @@ export class GameRunService {
   private readonly persistenceService = inject(GameRunPersistenceService);
   private readonly engine = new GameEngine();
 
-  async newGame(): Promise<GameUiState[]> {
+  get snapshots$() {
+    return this.engine.snapshots$;
+  }
+
+  async newGame() {
     const level = await this.persistenceService.getMaxPoints();
-    return this.engine.startNewGame(level);
+    this.engine.startNewGame(level);
   }
 
-  async finish(win: boolean): Promise<GameUiState[]> {
+  async finish(win: boolean) {
     await this.persistenceService.updateMaxPoints(win ? 1 : -1);
-    return this.engine.finishCurrentGame();
+    this.engine.finishCurrentGame();
   }
 
-  async play(card: CardState): Promise<GameUiState[]> {
-    return this.engine.play(card.id);
+  play(card: CardState) {
+    this.engine.play(card.id);
   }
 
-  async target(cardStates: CardState[]): Promise<GameUiState[]> {
+  target(cardStates: CardState[]) {
     const targetIds = cardStates.map((card) => card.id);
-
-    return this.engine.target(targetIds);
+    this.engine.targetReady$.next({ ids: targetIds });
   }
 }
